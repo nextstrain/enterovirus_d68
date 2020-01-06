@@ -1,0 +1,66 @@
+{
+  "title": "Phylodynamics of Enterovirus D68",
+  "color_options": {
+    "gt": {
+      "menuItem": "genotype",
+      "legendTitle": "Genotype",
+      "type": "discrete",
+      "key": "genotype"
+    },
+    "age": {
+      "menuItem": "Host age",
+      "legendTitle": "Host Age (years)",
+      "type": "continuous",
+      "key": "age"
+    },
+    "age_range1": {
+      "menuItem": "Age range 1",
+      "legendTitle": "Age range",
+      "type": "discrete",
+      "key": "age_range1"
+    },
+    "age_range2": {
+      "menuItem": "Age range 2",
+      "legendTitle": "Age range",
+      "type": "discrete",
+      "key": "age_range2"
+    },
+    "age_range3": {
+      "menuItem": "Age range 3",
+      "legendTitle": "Age range",
+      "type": "discrete",
+      "key": "age_range3"
+    },
+    "num_date": {
+      "menuItem": "date",
+      "legendTitle": "Sampling date",
+      "type": "continuous",
+      "key": "num_date"
+    },
+    "country": {
+      "type": "discrete"
+    },
+    "region": {
+      "type": "discrete"
+    },
+    "clade_membership":{
+      "menuItem": "Clade",
+      "legendTitle": "Clade",
+      "type": "discrete",
+      "key": "clade_membership"
+    },
+    "symptom":{
+      "type":"discrete"
+    }
+  },
+  "geo": [
+    "country", "region"
+  ],
+  "maintainer": [
+    "Emma Hodcroft, Richard Neher, Robert Dyrdak, Jan Albert",
+    "http://neherlab.org"
+  ],
+  "filters": [
+    "country", "region", "clade_membership"
+  ]
+}

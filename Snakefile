@@ -1,0 +1,495 @@
+# Example run call:
+#   source activate entero
+#   nohup snakemake default_vp1 --jobscript submit.sh --jobs 4 --cluster sbatch 1>log &
+
+### min_len
+# allows users to set the min sequence length in 'filter' through the file name.
+# It must be either nothing or preceeded by an underscore.
+# *** It DOES NOT CHANGE what's downloaded from GenBank/ViPR ***
+# This is to include 'manual' or 'personal' sequences that are shorter, in a 700bp background tree
+#Ex: "vp1/auspice/enterovirus_d68_vp1_300_tree.json" will do a VP1 run with min-length 300
+
+### max_year
+# allows users to set the max year in 'filter' through the file name.
+# It must be either nothing or an underscore followed by 4-digit year (starting 20-- or 19--) followed by 'y'
+# (This allows it to be distinguished from min_length by snakemake)
+# NOTE:
+#   THIS MAY NOT WORK HOW YOU THINK. '_2018y' will include sequences UP TO 2019.0 (aka all of 2018)
+#   This is because I think the file name '2018y' *including* samples up to 2018 is more intuitive.
+
+
+wildcard_constraints:
+    length="vp1|genome",
+    min_len="|_[0-9]+",
+    max_year="|_20[0-9]{2}[y]|_19[0-9]{2}[y]",
+    gene="|-vp4|-vp2|-vp3|-vp1|-2A|-2B|-2C|-3A|-3B|-3C|-3D"
+    #from: https://bitbucket.org/snakemake/snakemake/issues/910/empty-wildcard-assignment-works-only-if
+
+###EXAMPLE RUNS:
+#To run a default (700bp, all avail years) VP1 run:
+# snakemake "vp1/auspice/enterovirus_d68_vp1_tree.json"
+# or
+# snakemake default_vp1
+
+#To run a default (no filter length, all avail years) genome run:
+# snakemake "genome/auspice/enterovirus_d68_genome_tree.json"
+# or
+# snakemake default_genome
+
+#To run a VP1 run with all years but 300bp filter step (for 2019 seq analysis):
+# snakemake "vp1/auspice/enterovirus_d68_vp1_300_tree.json"
+
+#To run a vp1 run with only sequences up to 2018 (for paper)
+# snakemake "vp1/auspice/enterovirus_d68_vp1_2018y_tree.json"
+
+#To run a genome run with only sequences up to 2018 (for paper)
+# snakemake "genome/auspice/enterovirus_d68_genome_2018y_tree.json"
+
+#To combine two things (300bp filter and 2018 sequences):
+# snakemake "vp1/auspice/enterovirus_d68_vp1_300_2018y_tree.json"
+
+#To run all genes in genome: (some are too short and will fail) with default settings
+# snakemake genome_genes
+
+rule all: #essentially runs 'default_vp1' and 'default_genome' rules
+    input:
+        auspice_tree = expand("{seg}/auspice/enterovirus_d68_{seg}_tree.json", seg=["vp1","genome"]),
+        auspice_meta = expand("{seg}/auspice/enterovirus_d68_{seg}_meta.json", seg=["vp1","genome"])
+
+rule vp1:
+    input:
+        auspice_tree = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_tree.json",
+        auspice_meta = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_meta.json"
+
+rule genome:
+    input:
+        auspice_tree = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_tree.json",
+        auspice_meta = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_meta.json"
+
+GENES = ["-vp4","-vp2","-vp3","-vp1","-2A","-2B","-2C","-3A","-3B","-3C","-3D"]
+rule genome_genes:
+    input:
+        auspice_tree = expand("genome/auspice/enterovirus_d68_genome{genes}_tree.json", genes=GENES),
+        auspice_meta = expand("genome/auspice/enterovirus_d68_genome{genes}_meta.json", genes=GENES)
+
+rule default_vp1:
+    input:
+        auspice_tree = "vp1/auspice/enterovirus_d68_vp1_tree.json",
+        auspice_meta = "vp1/auspice/enterovirus_d68_vp1_meta.json"
+
+rule default_genome:
+    input:
+        auspice_tree = "genome/auspice/enterovirus_d68_genome_tree.json",
+        auspice_meta = "genome/auspice/enterovirus_d68_genome_meta.json",
+
+rule files:
+    input:
+        #samples sequenced in Sweden
+        swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
+        swedish_meta = "data/20190611_Karolinska-region.csv",
+        #samples added manually - not from ViPR
+        manual_seqs = "{length}/data/manual-seqs-ages.fasta",
+        manual_meta = "{length}/data/manual-meta-ages.csv",
+
+        #add historic data? Currently not used!
+        hist_meta = "data/others_from_adam.csv", #"data/all_hist.csv",
+        hist_seqs = "data/others_from_adam.fst", #"data/all_hist.fasta",
+
+        #other data files (common to both runs)
+        extra_meta = "data/age-data.tsv",
+
+        #config files
+        dropped_strains = "{length}/config/dropped_strains.txt",
+        kept_strains = "{length}/config/kept_strains.txt",
+        align_annot_ref = "{length}/config/ev_d68_reference_{length}.gb",
+        clades = "{length}/config/clades.tsv",
+        auspice_config = "{length}/config/auspice_config.json",
+        colors = "{length}/config/colors.tsv",
+        lat_long = "{length}/config/lat_longs.tsv"
+
+files = rules.files.input
+
+
+##############################
+# Concatenate genbank data with Swedish and Manual
+# We want this to run if changes to Swedish/Manual, even if not new Genbank!
+###############################
+rule concat_meta:
+    input:
+        metadata = [files.swedish_meta, files.manual_meta, #files.hist_meta,
+            "{length}/genbank/genbank_meta.tsv"]
+    output:
+        metadata = "{length}/results/metadata.tsv"
+    run:
+        import pandas as pd
+        from augur.parse import fix_dates, forbidden_characters
+        md = []
+        for fname in input.metadata:
+            tmp = pd.read_csv(fname, sep='\t' if fname.endswith('tsv') else ',')
+            tmp_name = []
+            for x in tmp.strain:
+                f = x
+                for c,r in forbidden_characters:
+                    f=f.replace(c,r)
+                tmp_name.append(f)
+            tmp.strain = tmp_name
+            md.append(tmp)
+        all_meta = pd.concat(md, sort=True)
+        all_meta.to_csv(output.metadata, sep='\t', index=False)
+
+#concatenate genbank seqs with Swedish & manual
+rule concat_sequences:
+    input:
+        files.swedish_seqs, files.manual_seqs, #files.hist_seqs,
+            "{length}/genbank/genbank_sequences.fasta"
+    output:
+        "{length}/results/sequences.fasta"
+    shell:
+        '''
+        cat {input} > {output}
+        '''
+
+
+##############################
+# add age data! (and other metadata)
+###############################
+rule add_age:
+    input:
+        metadata = rules.concat_meta.output.metadata, #"{length}/results/metadata.tsv",
+        ages = files.extra_meta,
+    output:
+        age_out = "{length}/results/metadata-raw-ages.tsv",
+        meta = "{length}/results/metadata-ages.tsv"
+    shell:
+        """
+        python scripts/parse_ages.py --ages-in {input.ages} --meta-in {input.metadata} \
+            --meta-out-ages {output.age_out} --meta-out {output.meta}
+        """
+
+##############################
+# now run usual augur analysis
+###############################
+
+rule filter:
+    input:
+        sequences = rules.concat_sequences.output, #"{length}/results/sequences.fasta",
+        metadata = rules.add_age.output.meta,
+        exclude = files.dropped_strains,
+        include = files.kept_strains
+    output:
+        sequences = "{length}/results/filtered{min_len}{max_year}.fasta"
+    params:
+        #sequences_per_category = 20,
+        categories = "country year month",
+        min_date = 1990, #change to 1950 to include 1962 seq
+    shell:
+        """
+        # Figure out what min seq per category to use
+        if [ "{wildcards.length}" == "genome" ]; then
+            echo "Subsampling by 200 per category"
+            seq_per_group="--sequences-per-group 200"
+        else
+            echo "Subsampling by 20 per category"
+            seq_per_group="--sequences-per-group 20"
+        fi
+
+        # Figure out what max year to use
+        mxyr="{wildcards.max_year}"
+        if [ -z "$mxyr" ]; then
+            echo "Filtering without maximum year argument"
+            maxyeararg=""
+        else
+            maxyr="${{mxyr//[_y]/}}"
+            echo "Filtering with maximum year argument of $maxyr"
+            realmaxyr="$(($maxyr+1))"
+            maxyeararg="--max-date $realmaxyr"
+            echo "   This is passed to augur as $maxyeararg"
+        fi
+
+        # Figure out minimum filter length to use
+        WCD="{wildcards.min_len}"
+        if [ -z "$WCD" ]
+        then
+            if [ "{wildcards.length}" == "vp1" ]
+            then
+                echo "Filtering with default VP1 minimum length of 700"
+                minlen="--min-length 700"
+            else
+                echo "Filtering with full-genome minimum length of 6000"
+                minlen="--min-length 6000"
+            fi
+        else
+            echo "Filtering with minimum length argument of ${{WCD//_/}}"
+            minlen="--min-length ${{WCD//_/}}"
+            # echo $minlen
+        fi
+
+        augur filter --sequences {input.sequences} --metadata {input.metadata} \
+            --output {output.sequences} \
+            --group-by {params.categories} \
+            $seq_per_group \
+            --exclude {input.exclude}  --min-date {params.min_date} \
+            $maxyeararg \
+            --include {input.include} \
+            $minlen
+        """
+        #--sequences-per-group {params.sequences_per_category} \
+        # MINLEN=${ $WCD | sed -r 's/_//g' }
+
+rule align:
+    input:
+        sequences = rules.filter.output.sequences,
+        reference = files.align_annot_ref
+    output:
+        alignment = "{length}/results/aligned{min_len}{max_year}.fasta"
+    shell:
+        """
+        augur align --sequences {input.sequences} --output {output.alignment} \
+            --reference-sequence {input.reference} --remove-reference
+        """
+
+rule sub_alignments:
+    input:
+        rules.align.output.alignment
+    output:
+        alignment = "{length}/results/aligned{gene}{min_len}{max_year}.fasta"
+    run:
+        real_gene = wildcards.gene.replace("-","",1)
+        boundaries = {
+            'vp4':(732,939),    'vp2':(939,1683),
+            'vp3':(1683,2388),  'vp1':(2388,3315),
+            '2A':(3315,3756),   '2B':(3756,4053),
+            '2C':(4053,5043),   '3A':(5043,5310),
+            '3B':(5310,5376),   '3C':(5376,5925),
+            '3D':(5925,7296)}
+        b = boundaries[real_gene]
+        from Bio import SeqIO
+        alignment = SeqIO.parse(input[0], "fasta")
+        with open(output.alignment, "w") as oh:
+            for record in alignment:
+                sequence = record.seq.tomutable()
+                gene_keep = sequence[b[0]:b[1]]
+                sequence[0:len(sequence)] = len(sequence)*"N"
+                sequence[b[0]:b[1]] = gene_keep
+                record.seq = sequence
+                SeqIO.write(record, oh, "fasta")
+
+
+rule tree:
+    input:
+        alignment = rules.sub_alignments.output.alignment #"{length}/results/aligned{gene}{min_len}{max_year}.fasta" #[rules.align.output.alignment]
+    output:
+        tree = "{length}/results/raw_tree{gene}{min_len}{max_year}.nwk"
+    shell:
+        """
+        augur tree --alignment {input.alignment} --output {output.tree}
+        """
+
+rule refine:
+    input:
+        tree = rules.tree.output.tree,
+        alignment = rules.sub_alignments.output.alignment,
+        metadata = rules.add_age.output.meta
+    output:
+        tree = "{length}/results/tree{gene}{min_len}{max_year}.nwk",
+        node_data = "{length}/results/branch_lengths{gene}{min_len}{max_year}.json"
+    params:
+        clock_filter_iqd = 5
+    shell:
+        """
+        augur refine --tree {input.tree} --alignment {input.alignment} \
+            --metadata {input.metadata} \
+            --output-tree {output.tree} --output-node-data {output.node_data} \
+            --timetree --date-confidence --date-inference marginal --coalescent opt \
+            --clock-filter-iqd {params.clock_filter_iqd}
+        """
+
+rule ancestral:
+    input:
+        tree = rules.refine.output.tree,
+        alignment = rules.sub_alignments.output.alignment,
+    output:
+        nt_data = "{length}/results/nt_muts{gene}{min_len}{max_year}.json"
+    params:
+        inference = "joint"
+    shell:
+        """
+        augur ancestral --tree {input.tree} --alignment {input.alignment} \
+            --output {output.nt_data} --inference {params.inference} \
+            --keep-ambiguous
+        """
+
+rule translate:
+    input:
+        tree = rules.refine.output.tree,
+        node_data = rules.ancestral.output.nt_data,
+        reference = files.align_annot_ref
+    output:
+        aa_data = "{length}/results/aa_muts{gene}{min_len}{max_year}.json"
+    params:
+        gene_alignment = "{length}/results/aa_alignment{gene}{min_len}{max_year}_%GENE.fasta"
+    shell:
+        """
+        augur translate --tree {input.tree} --ancestral-sequences {input.node_data} \
+            --alignment-output {params.gene_alignment} \
+            --output-node-data {output.aa_data} --reference-sequence {input.reference}
+        """
+
+rule clades:
+    input:
+        tree = rules.refine.output.tree,
+        aa_muts = rules.translate.output.aa_data,
+        nuc_muts = rules.ancestral.output.nt_data,
+        clades = files.clades
+    output:
+        clade_data = "{length}/results/clades{gene}{min_len}{max_year}.json"
+    shell:
+        """
+        augur clades --tree {input.tree} \
+            --mutations {input.nuc_muts} {input.aa_muts} \
+            --clades {input.clades} \
+            --output-node-data {output.clade_data}
+        """
+
+rule traits:
+    input:
+        tree = rules.refine.output.tree,
+        metadata = rules.add_age.output.meta
+    output:
+        node_data = "{length}/results/traits{gene}{min_len}{max_year}.json",
+    params:
+        columns = "country region"
+    shell:
+        """
+        augur traits --tree {input.tree} --metadata {input.metadata} \
+            --output-node-data {output.node_data} --confidence --columns {params.columns}
+        """
+
+## This will only run for VP1 runs!!
+rule epitopes:
+    input:
+        anc_seqs = rules.ancestral.output.nt_data, #"results/nt_muts_vp1.json",
+        tree = rules.refine.output.tree #"results/tree_vp1.nwk"
+    output:
+        node_data = "{length}/results/epitopes{gene}{min_len}{max_year}.json"
+    params:
+        epitopes = {'BC':[89,91,94,96,97,102], 'DE':[139,140,141,142,143,144,145,146,147],
+                    'CTERM':[279,282,283,287,289,296,298,300,303,304,305,307]},
+        min_count = 7
+    run:
+        import json
+        from collections import defaultdict
+        from augur.translate import safe_translate
+        from Bio import Phylo
+
+        manyXList = ["XXXXXXXXXXXX", "KEXXXXXXXXXX", "KERANXXXXXXX", "KERXXXXXXXXX", "KERAXXXXXXXX"]
+        with open(input.anc_seqs) as fh:
+            anc = json.load(fh)["nodes"]
+
+        T = Phylo.read(input.tree, 'newick')
+        for node in T.find_clades(order='preorder'):
+            for child in node:
+                child.parent = node
+
+        nodes = {}
+        epitope_counts = {epi: defaultdict(int) for epi in params.epitopes}
+
+        for node in T.find_clades(order='preorder'):
+            n = node.name
+            aa = safe_translate(anc[n]["sequence"])
+            nodes[n] = {}
+            for epi,pos in params.epitopes.items():
+                nodes[n][epi] = "".join([aa[p] for p in pos])
+                if epi is 'CTERM':
+                    if nodes[n]['CTERM'] in manyXList:
+                        nodes[n]['CTERM'] = "many x"
+                    elif 'X' in nodes[n]['CTERM']:
+                        nodes[n]['CTERM'] = nodes[node.parent.name]['CTERM']
+                if not n.startswith('NODE_'):
+                    epitope_counts[epi][nodes[n][epi]] += 1
+
+        for node in nodes:
+            for epi,seq in nodes[node].items():
+                min_count2 = params.min_count if epi is not "CTERM" else 6
+                if epi is "CTERM" and seq in manyXList:
+                    nodes[node][epi]='many X'
+                elif epitope_counts[epi][seq]<min_count2:#params.min_count:
+                    nodes[node][epi]='other'
+
+        with open(output.node_data, 'w') as fh:
+            json.dump({"epitopes": params.epitopes, "nodes":nodes}, fh)
+
+
+#this rule will generate new sequence and metadata file with the subgenogroup (clade)
+#that was assigned by 'clades' for each sequence - easier for analysis!
+#The output files also ONLY CONTAIN sequences that are IN 'clades' - so only those
+#in the final Nextstrain tree
+rule add_subgeno:
+    input:
+        meta = rules.add_age.output.meta,
+        clades = rules.clades.output.clade_data,
+        seqs = rules.sub_alignments.output.alignment,
+    output:
+        new_meta = "{length}/results/metadata_subgenotype{gene}{min_len}{max_year}.tsv",
+        new_seqs = "{length}/results/sequences_subgenotype{gene}{min_len}{max_year}.fasta"
+    shell:
+        """
+        python scripts/add_subgeno.py --seqs-in {input.seqs} --meta-in {input.meta} --clades {input.clades} \
+            --meta-out {output.new_meta} --seqs-out {output.new_seqs}
+        """
+
+
+#########################
+#  EXPORT
+#########################
+
+rule export_vp1:
+    input:
+        tree = rules.refine.output.tree,
+        metadata = rules.add_age.output.meta, #"results/metadata-ages-AFMmanual.tsv", #rules.add_age.output.meta, #rules.concat_meta.output.metadata,
+        branch_lengths = rules.refine.output.node_data,
+        nt_muts = rules.ancestral.output.nt_data,
+        aa_muts = rules.translate.output.aa_data,
+        epis = rules.epitopes.output.node_data,
+        clades = rules.clades.output.clade_data,
+        colors = files.colors,
+        auspice_config = files.auspice_config,
+        subgeno_meta = rules.add_subgeno.output.new_meta #this is just here to force the rule to run!
+    output:
+        auspice_tree = rules.vp1.input.auspice_tree,
+        auspice_meta = rules.vp1.input.auspice_meta
+    shell:
+        """
+        augur export v1 --tree {input.tree} --metadata {input.metadata} \
+            --node-data {input.branch_lengths} {input.nt_muts} \
+                {input.aa_muts} {input.clades} {input.epis} \
+            --auspice-config {input.auspice_config} \
+            --output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
+            --colors {input.colors}
+        """
+
+rule export_genome:
+    input:
+        tree = rules.refine.output.tree,
+        metadata = rules.add_age.output.meta, #"results/metadata-ages-src.tsv",
+        branch_lengths = rules.refine.output.node_data,
+        nt_muts = rules.ancestral.output.nt_data,
+        aa_muts = rules.translate.output.aa_data,
+        colors = files.colors,
+        clades = rules.clades.output.clade_data,
+        auspice_config = files.auspice_config, #"config/auspice_config_source.json"
+        lat_lon = files.lat_long,
+        subgeno_meta = rules.add_subgeno.output.new_meta #this is just here to force the rule to run!
+    output:
+        #auspice_treev1 = "auspice/enterovirus_d68_{seg}v1_tree.json",
+        #auspice_metav1 = "auspice/enterovirus_d68_{seg}v1_meta.json"
+        auspice_tree = rules.genome.input.auspice_tree,
+        auspice_meta = rules.genome.input.auspice_meta
+    shell:
+        """
+        augur export v1 --tree {input.tree} --metadata {input.metadata} \
+            --node-data {input.branch_lengths} {input.nt_muts} {input.aa_muts} {input.clades}\
+            --colors {input.colors} --auspice-config {input.auspice_config} \
+            --output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
+            --lat-longs {input.lat_lon}
+        """
