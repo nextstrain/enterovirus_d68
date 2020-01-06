@@ -66,7 +66,7 @@ Sequences with matches of at least 700bp are included. This was chosen because i
 When only whole-genome sequences are used, no BLASTing is done.
 
 ## Reruns
-This Snakefile saves a copy of the most recently run parsed, downloaded ViPR file, and uses this to decide whether an accession number is 'new.' f you delete or modify the files in the 'genbank' folder that's created, then you may trigger a completely new run.
+This Snakefile saves a copy of the most recently run parsed, downloaded ViPR file, and uses this to decide whether an accession number is 'new.' If you delete or modify the files in the 'genbank' folder that's created, then you may trigger a completely new run.
 
 
 
