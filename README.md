@@ -50,6 +50,12 @@ This Snakefile is written to make adding new data from ViPR easier. Simply downl
 
 After adding any new sequences, the a new full Nextstrain analysis will proceed. 
 
+# Input Files
+Currently you need already parsed, formatted, and BLASTed sequences from Genbank in the `vp1` or `genome` 'genbank' folder as `genbank_meta.tsv` and `genbank_sequences.fasta`.
+
+You can also have sequences to add manually, via the filenames `swedish_seqs` and `swedish_meta` in the top-level `data` folder or `manual_seqs` and `manual_meta` in the appropriate `vp1` or `genome` folder. These must also be formatted and already checked that they are either full-genome or contain VP1 (depending on the run). 
+
+You can add some extra data, particularly for sequences from GenBank where more detailed information can be scraped from papers, using the file named by `extra_meta`. This file should be tab-delimited with five columns: accession, date, age, sex, symptom. The data will be matched up to the combined metadata (from all of the above files) by accession. Dates need to be in the format YYYY-MM-DD and sex as `M` or `F`. Age can be multiple formats, such as: 2y3m, 20m, 2y, 15d, <12y, >79y, .5-10y. Unless specified by 'm' or 'd', numbers are taken as years: 2 is 2 years and 0.3 is 0.3 years. Ranges and greater-/less-than can be in months or years: 10m-3y. Symptoms can be as you wish, but should be consistent ('afm' and 'AFM' will be two different things).
 
 # Technical Notes
 _Below not yet implemented! Will not work!_
