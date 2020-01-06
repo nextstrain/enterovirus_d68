@@ -1,2 +1,72 @@
-# enterovirus_d68
-Enterovirus-D68 phylogenetic analyses code - actively maintained
+# Enterovirus D68 Nextstrain Analysis
+Performs a full Nextstrain analysis on Enterovirus D68 - currently a >=700bp VP1 run and a >=6000bp full-genome run. More may be added in future. 
+
+This repository will also eventually include code to update publicly available sequences by comparing new ViPR downloads against what's already part of the most recent run, but this isn't implemented yet. However, instructions below include this already (even though it's not yet implemented).
+
+### Data
+Note that the data used for these runs is *not* part of this repository. You can download publicly available data using the instructions below to add to your own run, and add any of your own data, too (see notes below on this).
+
+## Quickstart 
+### Setup
+To run automatically-downloaded VP1 sequences with this pipeline, you'll need to install local BLAST for this analysis to work. Do this with: 
+`sudo apt-get install ncbi-blast+`
+_(is this right?)_
+
+#### For Full-Genome Run
+Download in _tab delimited format_ all samples that are Enterovirus -> Enterovirus D -> Enterovirus D68 using ViPR's search function, with sequence length min:6400, max:8000.
+_(Using the 'full genome' tick-box will result in fewer sequences)_
+
+#### For VP1 Run
+Download in _tab delimited format_ all samples that are Enterovirus -> Enterovirus D -> Enterovirus D68 using ViPR's search function, without restriction on sequence length or dates. (There should be over 3,000.) 
+
+Place this file in the `data` folder of `vp1` or `genome`, and include the name of that file in the Snakefile (replacing `data/entero-30Jan18.tsv` or similar). 
+
+**Until the re-run feature is re-implemented parsed, cleaned, and BLAST-ed GenBank sequences & metadata need to go into the `vp1` or `genome` 'genbank' folder as `genbank_meta.tsv` and `genbank_sequences.fasta`.**
+
+Place sequences and metadata from full-genome Swedish (or your own) sequences in the top-level `data` folder, and ensure the filenames match the `swedish_seqs` and `swedish_meta` entries in the Snakefile. 
+
+If you have other sequences & metadata (manually curated) that you'd like to add, you can include these in by replacing `manual_seqs` and `manual_meta`. These will not be blasted, so ensure they are either full-genome or contain the VP1 gene, depending on the run.
+
+### Regions
+This script will allow you to look at sequences by region as well as country. The Snakefile is already set up for this kind of analysis, and region will be automatically generated for all downloaded sequences.
+
+*However*, you should ensure the Swedish metadata file, and any additional 'manual' files, have an additional column called 'region' with an entry for each sample. Otherwise, no Swedish/manual sequences will have a region. 
+
+### Running
+The call needs to specify the 'length' being run (vp1 or genome) and can also specify the minimum length and maximum year of sequences to be included. See comments at the beginning of the Snakefile for more explanation and examples. Notes that specifying '2018y' will include sequences UP TO 2019.0 (2018 will be the last year included). 
+
+There are also some Snakemake rules to make running some 'default' runs easier.
+
+Note that genome runs are filtered to 200 sequences per month per country per year, while VP1 runs are filtered to 20 sequences per month per country per year. If minimum sequence length isn't specified, the defaults are >=700bp and >=6000bp for VP1 and genome runs, respectively.
+
+_Below not yet implemented! Will not work!_
+Navigate to the `enterovirus_genome` folder and run `snakemake "auspice/enterovirus_d68_genome_tree.json"` to do a full-genome build. Initial runs may take some time, as downloading all sequences from GenBank is slow.
+
+All accession numbers are compared, so a sequence already included in 'Swedish' or 'manual' files will not be downloaded from GenBank.
+
+## Reruns
+_Not yet implemented! Will not work!_
+This Snakefile is written to make adding new data from ViPR easier. Simply download the latest full collection of samples from ViPR (using the same instructions as above), place the new file in `data`, and replace the filename in the Snakefile. Run `snakemake`, and the script should automatically only download and BLAST sequences with accesssion numbers that have not previously been checked (even if they were not included in the analysis). 
+
+After adding any new sequences, the a new full Nextstrain analysis will proceed. 
+
+
+# Technical Notes
+_Below not yet implemented! Will not work!_
+## Strain names
+In ViPR downloads as specified above, `strain` is not a unique identifier, as multiple segments may come from the same `strain`. This causes problems unique to VP1 analysis (with full-genome, this is not an issue). To handle this, in the VP1 run, the `vipr_parse.py` script generates new `strain` identifiers by combiing the original `strain` column with the accession number, separated by a double-underscore. 
+
+Unlike the VP1 run, strain names are not modified during the full-genome run.
+
+## Blasting
+ViPR sequences are not reliably labelled with the segment(s) they include (excepting whole-genome, it seems). In order to decide which sequences contain VP1, this script creates a local BLAST database against an EV-D68 reference genome VP1 sequence, then BLASTs all downloaded sequences against it.  
+
+Sequences with matches of at least 700bp are included. This was chosen because in initial runs, using >=600bp added only 47 sequences more and >=800bp lost 289 sequences. Only the matching sequence segment is taken for analysis.
+
+When only whole-genome sequences are used, no BLASTing is done.
+
+## Reruns
+This Snakefile saves a copy of the most recently run parsed, downloaded ViPR file, and uses this to decide whether an accession number is 'new.' f you delete or modify the files in the 'genbank' folder that's created, then you may trigger a completely new run.
+
+
+
