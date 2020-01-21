@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     #create new column for AFM (& reorder)
     meta = meta.reindex(columns = ['strain', 'accession', 'date', 'sex', 'age', 
-        'symptom', 'country', 'region', 'host',
+        'symptom', 'country', 'collab_country', 'region', 'host',
         'subgenogroup', 'Lab-ID', 'orig_strain', 'seq-len', 'genbank-host', 'moltype',
         'virus', 'authors', 'title', 'url'])
 
@@ -131,8 +131,9 @@ if __name__ == '__main__':
     meta.rename(columns={'age':'raw_age'}, inplace=True)
 
     #create new columns for new ages (& reorder)
-    meta = meta.reindex(columns = ['strain', 'accession', 'date', 'sex', 'raw_age', 
-        'symptom', 'age', 'age_range1', 'age_range2', 'age_range3', 'country', 'region', 'host',
+    meta = meta.reindex(columns = ['strain', 'accession', 'date', 'sex', 'raw_age',
+        'symptom', 'age', 'age_range1', 'age_range2', 'age_range3', 'country', 'region', 'collab_country',
+        'host',
         'subgenogroup', 'Lab-ID', 'orig_strain', 'seq-len', 'genbank-host', 'moltype',
         'virus', 'authors', 'title', 'url'])
 
