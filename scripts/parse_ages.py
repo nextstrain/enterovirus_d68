@@ -67,7 +67,7 @@ if __name__ == '__main__':
     meta = meta.reindex(columns = ['strain', 'accession', 'date', 'sex', 'age', 
         'symptom', 'country', 'collab_country', 'region', 'host',
         'subgenogroup', 'Lab-ID', 'orig_strain', 'seq-len', 'genbank-host', 'moltype',
-        'virus', 'authors', 'title', 'url'])
+        'virus', 'authors', 'title', 'url', 'paper_url'])
 
 
     for i, row in ages.iterrows():
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         'symptom', 'age', 'age_range1', 'age_range2', 'age_range3', 'country', 'region', 'collab_country',
         'host',
         'subgenogroup', 'Lab-ID', 'orig_strain', 'seq-len', 'genbank-host', 'moltype',
-        'virus', 'authors', 'title', 'url'])
+        'virus', 'authors', 'title', 'url', 'paper_url'])
 
     #create temp holders
     age = []

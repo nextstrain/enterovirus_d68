@@ -1,5 +1,5 @@
 {
-  "title": "Phylodynamics of Enterovirus D68",
+  "title": "Phylodynamics of Enterovirus D68 - VP1",
   "color_options": {
     "gt": {
       "menuItem": "genotype",
@@ -42,6 +42,12 @@
     },
     "region": {
       "type": "discrete"
+    },
+    "collab_country": {
+      "type": "discrete",
+      "menuItem": "Collaborators",
+      "legendTitle": "Collaborators",
+      "key": "collab_country"
     },
     "sex": {
       "type": "discrete"
