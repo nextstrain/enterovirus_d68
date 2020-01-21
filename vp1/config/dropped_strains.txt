@@ -34,3 +34,4 @@ EV-D68/Kozhikode/MCVRAH1535/2017
 2016-R5734__MH341723
 EVD68_ESP_022_181119_NFLG
 US/MO/14-18949__MH708882 #mouse-adapted virus
+DK_19_2019 #for the moment is bad quality! too many ambig bases
