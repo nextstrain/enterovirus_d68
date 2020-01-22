@@ -1,5 +1,6 @@
 # Example run call:
 #   source activate entero
+#   module load BLAST+   #IF DOING VP1 DATABASE BUILD ON SCICORE
 #   nohup snakemake default_vp1 --jobscript submit.sh --jobs 4 --cluster sbatch 1>log &
 
 ### min_len
@@ -84,7 +85,8 @@ rule default_genome:
 
 rule files:
     input:
-        raw_vipr_genome = "genome/data/genomeEntero-08Sept19.tsv", #15Jul19.tsv", #raw VIPR download!
+        raw_vipr_genome = "genome/data/genomeEntero-15Jul19.tsv", #raw VIPR download!
+        #raw_vipr_genome = "genome/data/genomeEntero-08Sept19.tsv", #raw VIPR download!
         raw_vipr_vp1 = "vp1/data/allEntero-08Sept19.tsv", #raw VIPR download!
         #raw_vipr_vp1 = "vp1/data/allEntero-15Jul19.tsv", #raw VIPR download!
 
