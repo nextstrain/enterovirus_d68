@@ -49,6 +49,10 @@
       "legendTitle": "Collaborators",
       "key": "collab_country"
     },
+    "date_added":{
+      "type": "discrete",
+      "key": "date_added"
+    },
     "sex": {
       "type": "discrete"
     },
