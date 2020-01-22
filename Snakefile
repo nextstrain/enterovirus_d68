@@ -84,6 +84,10 @@ rule default_genome:
 
 rule files:
     input:
+        raw_vipr_genome = "genome/data/genomeEntero-08Sept19.tsv", #15Jul19.tsv", #raw VIPR download!
+        raw_vipr_vp1 = "vp1/data/allEntero-08Sept19.tsv", #raw VIPR download!
+        #raw_vipr_vp1 = "vp1/data/allEntero-15Jul19.tsv", #raw VIPR download!
+
         #samples sequenced in Sweden
         swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
         swedish_meta = "data/20190611_Karolinska-region.csv",
@@ -105,9 +109,338 @@ rule files:
         clades = "{length}/config/clades.tsv",
         auspice_config = "{length}/config/auspice_config.json",
         colors = "{length}/config/colors.tsv",
-        lat_long = "{length}/config/lat_longs.tsv"
+        lat_long = "{length}/config/lat_longs.tsv",
+        regions = "scripts/geo_regions.tsv",
+        blast_ref = "vp1/config/ev_d68_reference_vp1.fasta"
 
 files = rules.files.input
+
+import os.path
+RERUN = True if os.path.isfile("{length}/genbank/current_vipr_download.tsv") else False
+
+# This function checks for presence of a file to determine if a rerun!
+def is_rerun(wildcards):
+    #print("{}/genbank/current_vipr_download.tsv".format(wildcards))
+    #print(os.path.isfile("{}/genbank/current_vipr_download.tsv".format(wildcards)))
+    return os.path.isfile("{}/genbank/current_vipr_download.tsv".format(wildcards))
+
+# This figures out which ViPR file to use depending on whether calling genome or vp1 run
+VIPR_FILES = {"genome": files.raw_vipr_genome, "vp1": files.raw_vipr_vp1}
+
+##############################
+# Parse metadata from ViPR
+# adds a column 'orig_strain' - adds accession to new 'strain' for VP1, blank for genome
+###############################
+rule parse_vipr_meta:
+    input:
+        meta = lambda wildcards: VIPR_FILES[wildcards.length],
+        regions = ancient(files.regions)
+    output:
+        out = "{length}/temp/current_vipr_download.tsv"
+    params:
+        rerun = lambda wildcards: is_rerun(wildcards.length)
+    #messages do not work with calling lambda functions....
+    #message:
+    #    "This {wildcards.length} rerun will use existing GenBank files! Only new accession numbers will be downloaded" if (lambda wildcards: is_rerun(wildcards.length)) else "Starting new {wildcards.length} run from scratch. All VIPR samples will be downloaded."
+    shell:
+        """
+        # Figure out message to show user.
+        rrun={params.rerun}
+        if [ $rrun == "True" ]; then
+            echo "This {wildcards.length} rerun will use existing GenBank files! Only new accession numbers will be downloaded"
+        else
+            echo "Starting new {wildcards.length} run from scratch. All VIPR samples will be downloaded."
+        fi
+
+        python scripts/vipr_parse.py --input {input.meta} --output {output.out} \
+            --regions {input.regions} \
+            --length {wildcards.length}
+        """
+
+##############################
+# FIND NEW
+# find only new seqs to download - exclude those in 'Swedish' or 'manual'
+# Send possible link to current download file - if empty (newrun) will be ignored.
+# If not empty (rerun), these will also be ignored
+###############################
+rule find_new:
+    input:
+        swed_meta = ancient(files.swedish_meta), #do not rerun if other meta changes - won't influence genbank!
+        man_meta = ancient(files.manual_meta),
+        new_meta = rules.parse_vipr_meta.output.out
+    params:
+        old_meta = ancient("{length}/genbank/current_vipr_download.tsv")
+    output:
+        "{length}/temp/meta_to_download.tsv" 
+    shell:
+        """
+        python scripts/find_new.py --input-new {input.new_meta} \
+            --exclude {input.swed_meta} {input.man_meta} {params.old_meta} \
+            --output {output}
+        """
+
+
+##############################
+# Download from Genbank only new and non-duplicate sequences
+###############################
+rule download_seqs:
+    input:
+        meta = "{length}/temp/meta_to_download.tsv"
+    output:
+        sequences = "{length}/temp/downloaded_seqs.fasta",
+        meta = "{length}/temp/downloaded_meta.tsv"
+    run:
+        import pandas as pd
+        from Bio import Entrez, SeqIO
+        from augur.parse import forbidden_characters
+        from datetime import datetime
+        Entrez.email = "richard.neher@unibas.ch"
+
+        print(input.meta)
+        meta = pd.read_csv(input.meta, sep='\t')
+        originalMetaLen = len(meta)
+        additional_meta = {}
+        len_cutoff = 6400 if wildcards.length=="genome" else 300
+        print("Downloading only {} sequences with length >= {}".format(wildcards.length, len_cutoff))
+
+        tooShort = []
+        didntWork = []
+        with open(output.sequences, 'w') as fh:
+            for ri, row in meta.iterrows():
+                try:
+                    handle = Entrez.efetch(db="nucleotide", id=row.accession, rettype="gb", retmode="text")
+                except:
+                    print(row.accession, "did not work")
+                    didntWork.append("{}\t{}".format(row.strain, row.accession))
+                    meta.drop(ri, inplace=True)
+                    continue
+                print(row.strain, row.accession)
+                rec = SeqIO.read(handle, 'genbank')
+                if len(rec.seq) - rec.seq.count("N") < len_cutoff:
+                    print(row.strain, row.accession, "is too short when Ns removed!")
+                    tooShort.append("{}\t{}".format(row.strain, row.accession))
+                    meta.drop(ri, inplace=True)
+                    continue
+                try:
+                    authors = rec.annotations['references'][0].authors
+                    title = rec.annotations['references'][0].title
+                except:
+                    authors = ''
+                    title = ''
+
+                url = 'https://www.ncbi.nlm.nih.gov/nuccore/'+row.accession
+                add_date = datetime.today().strftime('%Y-%m-%d')
+                additional_meta[ri] = {'url':url, 'authors':authors, 'title':title, 'date_added':add_date}
+                tmp = row.strain
+                for c,r in forbidden_characters:
+                    tmp=tmp.replace(c,r)
+                rec.id = tmp
+                rec.name = tmp
+                rec.description = ''
+                SeqIO.write(rec, fh, 'fasta')
+
+        print("\n")
+        print(len(tooShort), "sequences were too short after Ns were removed, and were excluded.")
+        shortFile = "{}/temp/too_short.txt".format(wildcards.length)
+        if tooShort:
+            with open(shortFile, 'w') as f:
+                for item in tooShort:
+                    f.write("%s\n" % item)
+            print("You can see those excluded as too short in '{}'".format(shortFile))
+
+        print(len(didntWork), "sequences weren't able to be downloaded and were excluded.")
+        didntFile = "{}/temp/didnt_work.txt".format(wildcards.length)
+        if didntWork:
+            with open(didntFile, 'w') as f:
+                for item in didntWork:
+                    f.write("%s\n" % item)
+            print("You can see those that failed to download in '{}'".format(didntFile))
+
+        print("\nOf {} files we tried to download, {} were downloaded.".format(originalMetaLen,len(meta)))
+        add_meta = pd.DataFrame(additional_meta).transpose()
+        all_meta = pd.concat((meta, add_meta), axis=1)
+        all_meta.to_csv(output.meta, sep='\t', index=False)
+
+
+#####################################################################################################
+#    BLAST - or not
+#       If VP1, need to BLAST. if genome, do not, but must rename files.
+#####################################################################################################
+
+##############################
+# If VP1 - BLAST
+###############################
+rule blast:        
+    input:
+        blast_db_file = files.blast_ref,
+        seqs_to_blast =  "vp1/temp/downloaded_seqs.fasta" #from rule download.seqs output
+    output:
+        blast_out = "vp1/temp/blast_out.csv"
+    run:
+        from subprocess import call
+        import os
+        comm = ["makeblastdb -in", input.blast_db_file, "-out vp1/temp/entero_db_vp1 -dbtype nucl"]
+        cmd = " ".join(comm)
+        os.system(cmd)
+        comm2 = ["blastn -task blastn -query", input.seqs_to_blast, "-db vp1/temp/entero_db_vp1 -outfmt '10 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs' -out", output.blast_out, "-evalue 0.0005"]
+        cmd2 = " ".join(comm2)
+        os.system(cmd2)
+
+        #blast output is specified by the call - here is what the columns are:
+        #(query is the Genbank seq we are looking for a match in, subject is the reference VP1 alignment)
+        ##First 7 columns:
+        #10     qseqid  sseqid  pident  length      mismatch    gapopen 
+        #csv    queryID subjID  %match  alignLen    #mismatch   #gap    
+
+        ##Next 4 columns
+        #qstart                     qend                    sstart                  send 
+        #start of align in query    end of align in query   start of align in subj  end of align in subj
+
+        ##Last 3 columns
+        #evalue         bitscore    qcovs
+        #Expect value   Bit score   Querty coverage per subject
+
+##############################
+# If VP1 - after BLAST, take only those that match
+###############################
+rule blast_sort:
+    input:
+        blast_result = rules.blast.output.blast_out,
+        input_meta = "vp1/temp/downloaded_meta.tsv", #from rule download.seqs output
+        input_seqs = "vp1/temp/downloaded_seqs.fasta" #from rule download.seqs output
+    output:
+        out_seqs = "vp1/temp/add_sequences.fasta" if (is_rerun("vp1")) else "vp1/temp/genbank_sequences.fasta",
+        out_meta = "vp1/temp/add_meta.tsv" if (is_rerun("vp1")) else "vp1/temp/genbank_meta.tsv"
+    params:
+        matchLen = 300,
+        dups = "vp1/temp/duplicates.tsv"
+    shell:
+        """
+        python scripts/blast_sort.py --blast {input.blast_result} \
+            --meta {input.input_meta} \
+            --seqs {input.input_seqs} \
+            --out_seqs {output.out_seqs} \
+            --out_meta {output.out_meta} \
+            --match_length {params.matchLen} \
+            --dup_file {params.dups}
+        """
+
+##############################
+# If genome, just change file name - no need to blast
+###############################
+rule rename_genome:
+    input:
+        sequences = "genome/temp/downloaded_seqs.fasta",
+        meta = "genome/temp/downloaded_meta.tsv"
+    output:
+        sequences = "genome/temp/add_sequences.fasta" if (is_rerun("genome")) else "genome/temp/genbank_sequences.fasta",
+        meta = "genome/temp/add_meta.tsv" if (is_rerun("genome")) else "genome/temp/genbank_meta.tsv"
+    shell:
+        """
+        cp {input.sequences} {output.sequences}
+        cp {input.meta} {output.meta}
+        """
+
+
+
+#####################################################################################################
+#    Bring together old and new files & create database
+#####################################################################################################
+
+##############################
+# Concat meta and sequences to existing Genbank
+###############################
+rule add_meta:
+    input:
+        metadata = [ancient("{length}/genbank/genbank_meta.tsv"), "{length}/temp/add_meta.tsv"]
+    output:
+        metadata = "{length}/temp/genbank_meta.tsv"
+    run:
+        import pandas as pd
+        from augur.parse import fix_dates, forbidden_characters
+        md = []
+        for fname in input.metadata:
+            tmp = pd.read_csv(fname, sep='\t' if fname.endswith('tsv') else ',')
+            tmp_name = []
+            for x in tmp.strain:
+                f = x
+                for c,r in forbidden_characters:
+                    f=f.replace(c,r)
+                tmp_name.append(f)
+            tmp.strain = tmp_name
+            md.append(tmp)
+        all_meta = pd.concat(md)
+        all_meta.to_csv(output.metadata, sep='\t', index=False)
+#concat sequences
+rule add_sequences:
+    input:
+        ancient("{length}/genbank/genbank_sequences.fasta"), "{length}/temp/add_sequences.fasta"
+    output:
+        "{length}/temp/genbank_sequences.fasta"
+    shell:
+        '''
+        cat {input} > {output}
+        '''
+
+##############################
+# If all has gone well - make a new Database!
+###############################
+rule make_database:
+    input:
+        gen_seqs = "{length}/temp/genbank_sequences.fasta",
+        gen_meta = "{length}/temp/genbank_meta.tsv",
+        download = "{length}/temp/current_vipr_download.tsv"
+    output:
+        gen_seqs = "{length}/genbank/genbank_sequences.fasta",
+        gen_meta = "{length}/genbank/genbank_meta.tsv",
+        download = "{length}/genbank/current_vipr_download.tsv",
+    params:
+        rerun = lambda wildcards: is_rerun(wildcards.length)
+    #messages do not work with calling lambda functions
+    #message:
+        #"Genbank files updated with new sequences!" if (lambda wildcards: is_rerun(wildcards.length)) else "Genbank files stored. Reruns will only download new accession numbers."
+    shell:
+        '''
+        cp {input.gen_seqs} {wildcards.length}/genbank
+        cp {input.gen_meta} {wildcards.length}/genbank
+        cp {input.download} {wildcards.length}/genbank
+        mv {input.gen_meta} "{wildcards.length}/temp/genbank_meta_old.tsv"
+        mv {input.gen_seqs} "{wildcards.length}/temp/genbank_sequences_old.fasta"
+
+        mv {wildcards.length}/temp/downloaded_meta.tsv {wildcards.length}/temp/downloaded_meta_old.tsv 
+        mv {wildcards.length}/temp/downloaded_seqs.fasta {wildcards.length}/temp/downloaded_seqs_old.fasta 
+
+        #count number of genbank sequences (minus 1 for header)
+        totalSeqs=$(($(cat {wildcards.length}/genbank/genbank_meta.tsv | wc -l)-1))
+
+        # Figure out message to show user.
+        rrun={params.rerun}
+        if [ $rrun == "True" ]; then
+            #count number of new sequences added (minus 1 for header)
+            newSeq=$(($(cat {wildcards.length}/temp/add_meta.tsv | wc -l)-1))
+            echo "Existing Genbank files updated with $newSeq new sequences!"
+            echo "There is now a total of $totalSeqs Genbank sequences"
+        else
+            echo "$totalSeqs Genbank sequences stored in database. Reruns will only download new accession numbers."
+        fi
+        '''
+
+rule make_database_genome:
+    input:
+        "genome/genbank/genbank_sequences.fasta",
+        "genome/genbank/genbank_meta.tsv"
+
+rule make_database_vp1:
+    input:
+        "vp1/genbank/genbank_sequences.fasta",
+        "vp1/genbank/genbank_meta.tsv"
+
+
+#####################################################################################################
+#####################################################################################################
+#    Bring together ViPR/Genbank and own samples
+#####################################################################################################
+#####################################################################################################
 
 
 ##############################
