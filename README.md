@@ -15,6 +15,7 @@ _(is this right?)_
 #### For Full-Genome Run
 Download in _tab delimited format_ all samples that are Enterovirus -> Enterovirus D -> Enterovirus D68 using ViPR's search function, with sequence length min:6400, max:8000.
 _(Using the 'full genome' tick-box will result in fewer sequences)_
+**BE AWARE** There are two sequences with strain name `US/MO/14-18949` - accession numbers KM851227 and MH708882. MH708882 is a *mouse-adapted strain* and should be excluded. It is in `genome/dropped_strains.txt` as US/MO/14-18949-Mouse. However, you will have to manually rename the strain in `genome/genbank/genbank_sequences.fasta` and `genome/genbank/genbank_meta.tsv`. To rename the correct sequence in the Fasta, unfortunately you will have to compare the sequence itself to the ones online, since the strain name is the same.
 
 #### For VP1 Run
 Download in _tab delimited format_ all samples that are Enterovirus -> Enterovirus D -> Enterovirus D68 using ViPR's search function, without restriction on sequence length or dates. (There should be over 3,000.) 
