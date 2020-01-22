@@ -65,13 +65,13 @@ CTERM	RERANEVTHDIT	#9A6324
 CTERM	many x	#6d6c6c
 CTERM	other	#a9a9a9
 
-collab_country	denmark	#3177eb
-collab_country	netherlands	#5eb1cc
-collab_country	switzerland	#85cdb8
-collab_country	belgium	#add65a
-collab_country	germany	#ebf44a
-collab_country	sweden	#ebcd4a
-collab_country	spain	#ffa03d
-collab_country	france	#fc72c4
+#collab_country	denmark	#3177eb
+#collab_country	netherlands	#5eb1cc
+#collab_country	switzerland	#85cdb8
+#collab_country	belgium	#add65a
+#collab_country	germany	#ebf44a
+#collab_country	sweden	#ebcd4a
+#collab_country	spain	#ffa03d
+#collab_country	france	#fc72c4
 #collab_country		#c80eb7
 #collab_country		#f41507
