@@ -85,11 +85,9 @@ rule default_genome:
 
 rule files:
     input:
-        raw_vipr_genome = "genome/data/genomeEntero-15Jul19.tsv", #raw VIPR download!
-        #raw_vipr_genome = "genome/data/genomeEntero-08Sept19.tsv", #raw VIPR download!
+        raw_vipr_genome = "genome/data/genomeEntero-22Jan20.tsv", #raw VIPR download!
         raw_vipr_vp1 = "vp1/data/allEntero-08Sept19.tsv", #raw VIPR download!
-        #raw_vipr_vp1 = "vp1/data/allEntero-15Jul19.tsv", #raw VIPR download!
-
+        
         #samples sequenced in Sweden
         swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
         swedish_meta = "data/20190611_Karolinska-region.csv",
