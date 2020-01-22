@@ -43,6 +43,16 @@
     "region": {
       "type": "discrete"
     },
+    "collab_country": {
+      "type": "discrete",
+      "menuItem": "Collaborators",
+      "legendTitle": "Collaborators",
+      "key": "collab_country"
+    },
+    "date_added":{
+      "type": "discrete",
+      "key": "date_added"
+    },
     "clade_membership":{
       "menuItem": "Clade",
       "legendTitle": "Clade",
@@ -61,6 +71,6 @@
     "http://neherlab.org"
   ],
   "filters": [
-    "country", "region", "clade_membership"
+    "country", "region", "clade_membership", "age_range1", "age_range3","symptom","collab_country"
   ]
 }

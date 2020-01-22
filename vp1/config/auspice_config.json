@@ -89,7 +89,7 @@
     "http://neherlab.org"
   ],
   "filters": [
-    "country", "region", "clade_membership", "age_range1", "symptom", "authors"
+    "country", "region", "clade_membership", "age_range1", "symptom", "collab_country"
   ],
   "defaults": {
     "colorBy": "region"
