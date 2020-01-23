@@ -780,7 +780,7 @@ rule add_subgeno:
 #currently only called for VP1 runs (since this will have more variation)
 rule add_seq_len:
     input:
-        seqs = alignment = rules.sub_alignments.output.alignment,
+        seqs = rules.sub_alignments.output.alignment,
         metadata = rules.add_subgeno.output.new_meta
     output:
         new_meta = "{length}/results/metadata_subgeno_seqlen{gene}{min_len}{max_year}.tsv"
