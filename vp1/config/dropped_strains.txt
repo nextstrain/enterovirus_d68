@@ -41,3 +41,9 @@ USA/2018-23209__MN389732  #cell culture isolate of clinical specimen MN246002
 USA/2018-23216__MN389733  #cell culture isolate of clinical specimen MN246009
 USA/2018-23252__MN389734  #cell culture isolate of clinical specimen MN246015
 USA/2018-23263__MN389735  #cell culture isolate of clinical specimen MN246026
+EV-D68/Homosapiens/USA/O622a/2012__KX255412 #divergence & date seem totally off - div puts in 2004, date is 2012
+CA/RESP/09-871__KM892497 #diverge & date seem off - div puts in 2009, date is 2013
+SH2808__KU242684 #end of this seq is very bad & cant be aligned
+HEV156010__KJ472882 # has A LOT of mutations at end - doesnt seem recomb - don't match w any other seq
+HEV137010__KJ472885 # has A LOT of mutations at end - doesnt seem recomb - don't match w any other seq
+2016-R6091 # very divergent - sequence not terrible. full genome fine. shares muts at end w 2016-R4460
