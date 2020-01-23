@@ -56,6 +56,12 @@
     "sex": {
       "type": "discrete"
     },
+    "seq-len": {
+      "menuItem": "Gap/N-free Sequence Len",
+      "legendTitle": "Gap/N-free Sequence Len",
+      "type": "continuous",
+      "key": "seq-len"
+    },
     "clade_membership":{
       "menuItem": "Clade",
       "legendTitle": "Clade",

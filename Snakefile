@@ -86,7 +86,7 @@ rule default_genome:
 rule files:
     input:
         raw_vipr_genome = "genome/data/genomeEntero-22Jan20.tsv", #raw VIPR download!
-        raw_vipr_vp1 = "vp1/data/allEntero-08Sept19.tsv", #raw VIPR download!
+        raw_vipr_vp1 = "vp1/data/allEntero-22Jan20.tsv", #raw VIPR download!
         
         #samples sequenced in Sweden
         swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
@@ -776,10 +776,26 @@ rule add_subgeno:
 #  EXPORT
 #########################
 
+# Adds the sequence length (corrected without - or N) to the subgeno metadata
+#currently only called for VP1 runs (since this will have more variation)
+rule add_seq_len:
+    input:
+        seqs = alignment = rules.sub_alignments.output.alignment,
+        metadata = rules.add_subgeno.output.new_meta
+    output:
+        new_meta = "{length}/results/metadata_subgeno_seqlen{gene}{min_len}{max_year}.tsv"
+    shell:
+        """
+        python scripts/add_seq_len.py --seqs-in {input.seqs} \
+            --meta-in {input.metadata} \
+            --meta-out {output.new_meta} \
+        """
+
+
 rule export_vp1:
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.add_age.output.meta, #"results/metadata-ages-AFMmanual.tsv", #rules.add_age.output.meta, #rules.concat_meta.output.metadata,
+        metadata = rules.add_seq_len.output.new_meta, #rules.add_age.output.meta, 
         branch_lengths = rules.refine.output.node_data,
         nt_muts = rules.ancestral.output.nt_data,
         aa_muts = rules.translate.output.aa_data,
