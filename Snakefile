@@ -105,6 +105,7 @@ rule files:
         #config files
         dropped_strains = "{length}/config/dropped_strains.txt",
         kept_strains = "{length}/config/kept_strains.txt",
+        kept_strains_300 = "{length}/config/kept_strains_300.txt",
         align_annot_ref = "{length}/config/ev_d68_reference_{length}.gb",
         clades = "{length}/config/clades.tsv",
         auspice_config = "{length}/config/auspice_config.json",
@@ -508,7 +509,8 @@ rule filter:
         sequences = rules.concat_sequences.output, #"{length}/results/sequences.fasta",
         metadata = rules.add_age.output.meta,
         exclude = files.dropped_strains,
-        include = files.kept_strains
+        include = files.kept_strains,
+        include_300 = files.kept_strains_300 #special include for 300bp run, until do better filtering
     output:
         sequences = "{length}/results/filtered{min_len}{max_year}.fasta"
     params:
@@ -557,17 +559,27 @@ rule filter:
             # echo $minlen
         fi
 
+        # Use special kept-strains file if 300bp run - until I get better filtering in place
+        if [ "${{WCD//_/}}" == 300 ]; then
+            echo "Using special 'kept_strains' file for 300bp run."
+            includefile="--include {input.include_300}"
+        else
+            echo "Using normal 'kept_strains' file."
+            includefile="--include {input.include}"
+        fi
+
         augur filter --sequences {input.sequences} --metadata {input.metadata} \
             --output {output.sequences} \
             --group-by {params.categories} \
             $seq_per_group \
             --exclude {input.exclude}  --min-date {params.min_date} \
             $maxyeararg \
-            --include {input.include} \
+            $includefile \
             $minlen
         """
         #--sequences-per-group {params.sequences_per_category} \
         # MINLEN=${ $WCD | sed -r 's/_//g' }
+        #--include {input.include} \
 
 rule align:
     input:
