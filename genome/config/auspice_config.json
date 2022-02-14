@@ -1,76 +1,89 @@
 {
   "title": "Phylodynamics of Enterovirus D68",
-  "color_options": {
-    "gt": {
-      "menuItem": "genotype",
-      "legendTitle": "Genotype",
-      "type": "discrete",
-      "key": "genotype"
-    },
-    "age": {
-      "menuItem": "Host age",
-      "legendTitle": "Host Age (years)",
+  "colorings": [
+    {
+      "title": "Host age (years)",
       "type": "continuous",
       "key": "age"
     },
-    "age_range1": {
-      "menuItem": "Age range 1",
-      "legendTitle": "Age range",
-      "type": "discrete",
+    {
+      "title": "Age range 1",
+      "type": "categorical",
       "key": "age_range1"
     },
-    "age_range2": {
-      "menuItem": "Age range 2",
-      "legendTitle": "Age range",
-      "type": "discrete",
+    {
+      "title": "Age range 2",
+      "type": "categorical",
       "key": "age_range2"
     },
-    "age_range3": {
-      "menuItem": "Age range 3",
-      "legendTitle": "Age range",
-      "type": "discrete",
+    {
+      "title": "Age range 3",
+      "type": "categorical",
       "key": "age_range3"
     },
-    "num_date": {
-      "menuItem": "date",
-      "legendTitle": "Sampling date",
+    {
+      "title": "Sampling date",
       "type": "continuous",
       "key": "num_date"
     },
-    "country": {
-      "type": "discrete"
+    {
+      "title": "Country",
+      "key": "country",
+      "type": "categorical"
     },
-    "region": {
-      "type": "discrete"
+    {
+      "title": "Region",
+      "type": "categorical",
+      "key": "region"
     },
-    "collab_country": {
-      "type": "discrete",
-      "menuItem": "Collaborators",
-      "legendTitle": "Collaborators",
+    {
+      "type": "categorical",
+      "title": "Collaborators",
       "key": "collab_country"
     },
-    "date_added":{
-      "type": "discrete",
+    {
+      "title": "Date added",
+      "type": "categorical",
       "key": "date_added"
     },
-    "clade_membership":{
-      "menuItem": "Clade",
-      "legendTitle": "Clade",
-      "type": "discrete",
+    {
+      "title": "Clade",
+      "type": "categorical",
       "key": "clade_membership"
     },
-    "symptom":{
-      "type":"discrete"
+    {
+      "title": "Symptom",
+      "key": "symptom",
+      "type":"categorical"
+    },
+    {
+      "title": "Gender",
+      "type": "categorical",
+      "key": "sex"
     }
-  },
-  "geo": [
+  ],
+  "geo_resolutions": [
     "country", "region"
   ],
-  "maintainer": [
-    "Emma Hodcroft, Richard Neher, Robert Dyrdak, Jan Albert",
-    "http://neherlab.org"
+  "maintainers": [
+    {"name": "Emma Hodcroft", "url": "http://emmahodcroft.com/"},
+    {"name": "Richard Neher", "url": "http://neherlab.org"},
+    {"name": "Robert Dyrdak", "url": "https://staff.ki.se/people/robert-dyrdak"},
+    {"name": "Jan Albert", "url": "https://staff.ki.se/people/jan-albert"}
   ],
   "filters": [
-    "country", "region", "clade_membership", "age_range1", "age_range3","symptom","collab_country"
+    "country", 
+    "region", 
+    "clade_membership", 
+    "age_range1", 
+    "age_range3",
+    "symptom",
+    "collab_country"
+  ],
+  "panels": [
+    "tree",
+    "map",
+    "entropy",
+    "frequencies"
   ]
 }

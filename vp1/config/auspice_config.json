@@ -1,103 +1,111 @@
 {
   "title": "Phylodynamics of Enterovirus D68 - VP1",
-  "color_options": {
-    "gt": {
-      "menuItem": "genotype",
-      "legendTitle": "Genotype",
-      "type": "discrete",
-      "key": "genotype"
-    },
-    "age": {
-      "menuItem": "Host age",
-      "legendTitle": "Host Age (years)",
+  "colorings": [
+    {
+      "title": "Host Age (years)",
       "type": "continuous",
       "key": "age"
     },
-    "age_range1": {
-      "menuItem": "Age range 1",
-      "legendTitle": "Age range",
-      "type": "discrete",
+    {
+      "title": "Age range 1",
+      "type": "categorical",
       "key": "age_range1"
     },
-    "age_range2": {
-      "menuItem": "Age range 2",
-      "legendTitle": "Age range",
-      "type": "discrete",
+    {
+      "title": "Age range 2",
+      "type": "categorical",
       "key": "age_range2"
     },
-    "age_range3": {
-      "menuItem": "Age range 3",
-      "legendTitle": "Age range",
-      "type": "discrete",
+    {
+      "title": "Age range 3",
+      "type": "categorical",
       "key": "age_range3"
     },
-    "num_date": {
-      "menuItem": "date",
-      "legendTitle": "Sampling date",
+    {
+      "title": "Sampling date",
       "type": "continuous",
       "key": "num_date"
     },
-    "country": {
-      "type": "discrete"
+    {
+      "title": "Country",
+      "type": "categorical",
+      "key": "country"
     },
-    "region": {
-      "type": "discrete"
+    {
+      "title": "Region",
+      "type": "categorical",
+      "key": "region"
     },
-    "collab_country": {
-      "type": "discrete",
-      "menuItem": "Collaborators",
-      "legendTitle": "Collaborators",
+    {
+      "type": "categorical",
+      "title": "Collaborators",
       "key": "collab_country"
     },
-    "date_added":{
-      "type": "discrete",
+    {
+      "title": "Date Added",
+      "type": "categorical",
       "key": "date_added"
     },
-    "sex": {
-      "type": "discrete"
+    {
+      "title": "Gender",
+      "type": "categorical",
+      "key": "sex"
     },
-    "seq-len": {
-      "menuItem": "Gap/N-free Sequence Len",
-      "legendTitle": "Gap/N-free Sequence Len",
+    {
+      "title": "Gap/N-free Sequence Len",
       "type": "continuous",
       "key": "seq-len"
     },
-    "clade_membership":{
-      "menuItem": "Clade",
-      "legendTitle": "Clade",
-      "type": "discrete",
+    {
+      "title": "Clade",
+      "type": "categorical",
       "key": "clade_membership"
     },
-    "symptom":{
-      "type": "discrete"
+    {
+      "title": "Symptom",
+      "type": "categorical",
+      "key": "symptom"
     },
-    "BC":{
-      "menuItem": "Epitope at BC loop (Pos 90,92,95,97,98,103)",
-      "legendTitle": "Epitope at BC loop (Pos 90,92,95,97,98,103)",
-      "type": "discrete"
+    {
+      "title": "Epitope at BC loop (Pos 90,92,95,97,98,103)",
+      "type": "categorical",
+      "key": "BC"
     },
-    "DE":{
-      "menuItem": "Epitope at DE loop (Pos 140,141,142,143,144,145,146,149)",
-      "legendTitle": "Epitope at DE loop (Pos 140,141,142,143,144,145,146,149)",
-      "type": "discrete"
+    {
+      "title": "Epitope at DE loop (Pos 140,141,142,143,144,145,146,149)",
+      "type": "categorical",
+      "key": "DE"
     },
-    "CTERM": {
-      "menuItem": "Epitope at C terminus",
-      "legendTitle": "Epitope at C terminus",
-      "type": "discrete"
+    {
+      "title": "Epitope at C terminus",
+      "type": "categorical",
+      "key": "CTERM"
     }
-  },
-  "geo": [
+  ],
+  "geo_resolutions": [
     "country", "region"
   ],
-  "maintainer": [
-    "Emma Hodcroft, Richard Neher, Robert Dyrdak, Jan Albert",
-    "http://neherlab.org"
+  "maintainers": [
+    {"name": "Emma Hodcroft", "url": "http://emmahodcroft.com/"},
+    {"name": "Richard Neher", "url": "http://neherlab.org"},
+    {"name": "Robert Dyrdak", "url": "https://staff.ki.se/people/robert-dyrdak"},
+    {"name": "Jan Albert", "url": "https://staff.ki.se/people/jan-albert"}
   ],
   "filters": [
-    "country", "region", "clade_membership", "age_range1", "symptom", "collab_country"
+    "country",
+    "region",
+    "clade_membership",
+    "age_range1",
+    "symptom",
+    "collab_country"
   ],
-  "defaults": {
-    "colorBy": "region"
-  }
+  "display_defaults": {
+    "color_by": "region"
+  },
+  "panels": [
+    "tree",
+    "map",
+    "entropy",
+    "frequencies"
+  ]
 }
