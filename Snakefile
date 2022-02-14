@@ -18,6 +18,7 @@
 #   THIS MAY NOT WORK HOW YOU THINK. '_2018y' will include sequences UP TO 2019.0 (aka all of 2018)
 #   This is because I think the file name '2018y' *including* samples up to 2018 is more intuitive.
 
+import datetime
 
 wildcard_constraints:
     length="vp1|genome",
@@ -28,60 +29,72 @@ wildcard_constraints:
 
 ###EXAMPLE RUNS:
 #To run a default (700bp, all avail years) VP1 run:
-# snakemake "vp1/auspice/enterovirus_d68_vp1_tree.json"
+# snakemake "vp1/auspice/enterovirus_d68_vp1.json"
 # or
 # snakemake default_vp1
 
 #To run a default (no filter length, all avail years) genome run:
-# snakemake "genome/auspice/enterovirus_d68_genome_tree.json"
+# snakemake "genome/auspice/enterovirus_d68_genome.json"
 # or
 # snakemake default_genome
 
 #To run a VP1 run with all years but 300bp filter step (for 2019 seq analysis):
-# snakemake "vp1/auspice/enterovirus_d68_vp1_300_tree.json"
+# snakemake "vp1/auspice/enterovirus_d68_vp1_300.json"
 
 #To run a vp1 run with only sequences up to 2018 (for paper)
-# snakemake "vp1/auspice/enterovirus_d68_vp1_2018y_tree.json"
+# snakemake "vp1/auspice/enterovirus_d68_vp1_2018y.json"
 
 #To run a genome run with only sequences up to 2018 (for paper)
-# snakemake "genome/auspice/enterovirus_d68_genome_2018y_tree.json"
+# snakemake "genome/auspice/enterovirus_d68_genome_2018y.json"
 
 #To combine two things (300bp filter and 2018 sequences):
-# snakemake "vp1/auspice/enterovirus_d68_vp1_300_2018y_tree.json"
+# snakemake "vp1/auspice/enterovirus_d68_vp1_300_2018y.json"
 
 #To run all genes in genome: (some are too short and will fail) with default settings
 # snakemake genome_genes
 
 rule all: #essentially runs 'default_vp1' and 'default_genome' rules
     input:
-        auspice_tree = expand("{seg}/auspice/enterovirus_d68_{seg}_tree.json", seg=["vp1","genome"]),
-        auspice_meta = expand("{seg}/auspice/enterovirus_d68_{seg}_meta.json", seg=["vp1","genome"])
+        #auspice_tree = expand("{seg}/auspice/enterovirus_d68_{seg}_tree.json", seg=["vp1","genome"]),
+        #auspice_meta = expand("{seg}/auspice/enterovirus_d68_{seg}_meta.json", seg=["vp1","genome"])
+        auspice_out = expand("{seg}/auspice/enterovirus_d68_{seg}.json", seg=["vp1","genome"]),
+        tip_freq_out = expand("{seg}/auspice/enterovirus_d68_{seg}_tip-frequencies.json", seg=["vp1","genome"])
 
 rule vp1:
     input:
-        auspice_tree = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_tree.json",
-        auspice_meta = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_meta.json"
+        #auspice_tree = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_tree.json",
+        #auspice_meta = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_meta.json"
+        auspice_out = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}.json",
+        tip_freq_out = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_tip-frequencies.json"
 
 rule genome:
     input:
-        auspice_tree = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_tree.json",
-        auspice_meta = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_meta.json"
+        #auspice_tree = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_tree.json",
+        #auspice_meta = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_meta.json"
+        auspice_out = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}.json",
+        tip_freq_out = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_tip-frequencies.json"
 
 GENES = ["-vp4","-vp2","-vp3","-vp1","-2A","-2B","-2C","-3A","-3B","-3C","-3D"]
 rule genome_genes:
     input:
-        auspice_tree = expand("genome/auspice/enterovirus_d68_genome{genes}_tree.json", genes=GENES),
-        auspice_meta = expand("genome/auspice/enterovirus_d68_genome{genes}_meta.json", genes=GENES)
+        #auspice_tree = expand("genome/auspice/enterovirus_d68_genome{genes}_tree.json", genes=GENES),
+        #auspice_meta = expand("genome/auspice/enterovirus_d68_genome{genes}_meta.json", genes=GENES)
+        auspice_out = expand("genome/auspice/enterovirus_d68_genome{genes}.json", genes=GENES),
+        tip_freq_out = expand("genome/auspice/enterovirus_d68_genome{genes}_tip-frequencies.json", genes=GENES)
 
 rule default_vp1:
     input:
-        auspice_tree = "vp1/auspice/enterovirus_d68_vp1_tree.json",
-        auspice_meta = "vp1/auspice/enterovirus_d68_vp1_meta.json"
+        #auspice_tree = "vp1/auspice/enterovirus_d68_vp1_tree.json",
+        #auspice_meta = "vp1/auspice/enterovirus_d68_vp1_meta.json"
+        auspice_out = "vp1/auspice/enterovirus_d68_vp1.json",
+        tip_freq_out = "vp1/auspice/enterovirus_d68_vp1_tip-frequencies.json"
 
 rule default_genome:
     input:
-        auspice_tree = "genome/auspice/enterovirus_d68_genome_tree.json",
-        auspice_meta = "genome/auspice/enterovirus_d68_genome_meta.json",
+        #auspice_tree = "genome/auspice/enterovirus_d68_genome_tree.json",
+        #auspice_meta = "genome/auspice/enterovirus_d68_genome_meta.json",
+        auspice_out = "genome/auspice/enterovirus_d68_genome.json",
+        tip_freq_out = "genome/auspice/enterovirus_d68_genome_tip-frequencies.json"
 
 rule files:
     input:
@@ -646,8 +659,10 @@ rule refine:
             --metadata {input.metadata} \
             --output-tree {output.tree} --output-node-data {output.node_data} \
             --timetree --date-confidence --date-inference marginal --coalescent opt \
+            --branch-length-inferece marginal \
             --clock-filter-iqd {params.clock_filter_iqd}
         """
+        # Have set --branch-length-inference to 'marginal' on recommendation of TreeTime warning when ran on auto
 
 rule ancestral:
     input:
@@ -660,7 +675,7 @@ rule ancestral:
     shell:
         """
         augur ancestral --tree {input.tree} --alignment {input.alignment} \
-            --output {output.nt_data} --inference {params.inference} \
+            --output-node-data {output.nt_data} --inference {params.inference} \
             --keep-ambiguous
         """
 
@@ -708,6 +723,75 @@ rule traits:
         """
         augur traits --tree {input.tree} --metadata {input.metadata} \
             --output-node-data {output.node_data} --confidence --columns {params.columns}
+        """
+
+def _get_max_date_for_frequencies(wildcards):
+    # Allow to censor the N most recent days to minimize effects of
+    # uneven recent sampling.
+    recent_days_to_censor = 30
+    offset = datetime.timedelta(days=recent_days_to_censor)
+
+    return numeric_date(
+        datetime.date.today() - offset
+    )
+
+def numeric_date(dt=None):
+    """
+    Convert datetime object to the numeric date.
+    The numeric date format is YYYY.F, where F is the fraction of the year passed
+    Parameters
+    ----------
+     dt:  datetime.datetime, None
+        date of to be converted. if None, assume today
+    """
+    from calendar import isleap
+
+    if dt is None:
+        dt = datetime.datetime.now()
+
+    days_in_year = 366 if isleap(dt.year) else 365
+    try:
+        res = dt.year + (dt.timetuple().tm_yday-0.5) / days_in_year
+    except:
+        res = None
+
+    return res
+
+rule tip_frequencies:
+    message: "Estimating censored KDE frequencies for tips"
+    input:
+        tree = rules.refine.output.tree,
+        metadata=rules.add_age.output.meta,
+    output:
+        tip_frequencies_json = "{length}/auspice/enterovirus_d68_{length}{gene}{min_len}{max_year}_tip-frequencies.json"
+    params:
+        min_date = "1987-01-01",
+        max_date = _get_max_date_for_frequencies,
+        # number of months between pivots
+        pivot_interval = 3,
+        #can specify weeks or months
+        pivot_interval_units = "months",
+        # KDE bandwidths in proportion of a year to use per strain.
+        # using 15 day bandwidth is 0.041
+        # using 90 day bandwidth is 0.25 
+        narrow_bandwidth = 0.16,
+        proportion_wide = 0
+    resources:
+        # Memory use scales primarily with the size of the metadata file.
+        mem_mb=12000
+    shell:
+        """
+        augur frequencies \
+            --method kde \
+            --metadata {input.metadata} \
+            --tree {input.tree} \
+            --min-date {params.min_date} \
+            --max-date {params.max_date} \
+            --pivot-interval {params.pivot_interval} \
+            --pivot-interval-units {params.pivot_interval_units} \
+            --narrow-bandwidth {params.narrow_bandwidth} \
+            --proportion-wide {params.proportion_wide} \
+            --output {output.tip_frequencies_json}
         """
 
 ## This will only run for VP1 runs!!
@@ -817,17 +901,20 @@ rule export_vp1:
         auspice_config = files.auspice_config,
         subgeno_meta = rules.add_subgeno.output.new_meta #this is just here to force the rule to run!
     output:
-        auspice_tree = rules.vp1.input.auspice_tree,
-        auspice_meta = rules.vp1.input.auspice_meta
+        #auspice_tree = rules.vp1.input.auspice_tree,
+        #auspice_meta = rules.vp1.input.auspice_meta
+        auspice = rules.vp1.input.auspice_out
     shell:
         """
-        augur export v1 --tree {input.tree} --metadata {input.metadata} \
+        augur export v2 --tree {input.tree} --metadata {input.metadata} \
             --node-data {input.branch_lengths} {input.nt_muts} \
                 {input.aa_muts} {input.clades} {input.epis} \
             --auspice-config {input.auspice_config} \
-            --output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
+            --output {output.auspice} \
+            --include-root-sequence \
             --colors {input.colors}
         """
+        #--output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
 
 rule export_genome:
     input:
@@ -844,13 +931,16 @@ rule export_genome:
     output:
         #auspice_treev1 = "auspice/enterovirus_d68_{seg}v1_tree.json",
         #auspice_metav1 = "auspice/enterovirus_d68_{seg}v1_meta.json"
-        auspice_tree = rules.genome.input.auspice_tree,
-        auspice_meta = rules.genome.input.auspice_meta
+        #auspice_tree = rules.genome.input.auspice_tree,
+        #auspice_meta = rules.genome.input.auspice_meta
+        auspice = rules.genome.input.auspice_out
     shell:
         """
-        augur export v1 --tree {input.tree} --metadata {input.metadata} \
+        augur export v2 --tree {input.tree} --metadata {input.metadata} \
             --node-data {input.branch_lengths} {input.nt_muts} {input.aa_muts} {input.clades}\
             --colors {input.colors} --auspice-config {input.auspice_config} \
-            --output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
+            --output {output.auspice} \
+            --include-root-sequence \
             --lat-longs {input.lat_lon}
         """
+        #--output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
