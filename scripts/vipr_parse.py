@@ -2,6 +2,7 @@ import pandas as pd
 from dateutil.parser import parse
 import re, os
 import shutil
+from augur.parse import prettify 
 
 
 if __name__ == '__main__':
@@ -20,7 +21,9 @@ if __name__ == '__main__':
 
     #list countries that need replacing
     # I don't know why Denmark matching doesn't work in lowercase - it should
-    country_replace = [['Viet Nam', 'vietnam'], ['Denmark', 'denmark'], [" ", "_"]]
+    # Though counter-intuitive, continue repalcing space with _ so that `prettify` function works correctly
+    country_replace = [['Viet Nam', 'Vietnam'], ['Denmark', 'Denmark'], [" ", "_"]]
+    small_word_replace = [["The", "the"], ["And", "and"], ["Of", "of"]]
 
     #Delete the last tab from the header row of the file downloaded from vipr... messes up pandas!!
     #copy - so we can overwrite original
@@ -41,13 +44,17 @@ if __name__ == '__main__':
     #unsure where subgenogroup information came from? not always there.
 
     if args.length=="vp1": #save original strain to make a new one
-        meta.columns = ['orig_strain', 'virus', 'accession', 'seq_len', 'date', 'host', 'genbank_host', 'country', 'moltype']
+        meta.columns = ['orig_strain', 'virus', 'accession', 'seq_len', 'pango lineage', 'date', 'host', 'genbank_host', 'country', 'moltype']
         meta = meta.reindex(columns = ['orig_strain', 'virus', 'subgenogroup', 'accession', 'seq_len', 'date', 'age', 'sex', 'host', 'genbank_host', 'country', 'moltype'])
     else: #if genome, strain will remain same
-        meta.columns = ['strain', 'virus', 'accession', 'seq_len', 'date', 'host', 'genbank_host', 'country', 'moltype']
+        meta.columns = ['strain', 'virus', 'accession', 'seq_len', 'pango lineage', 'date', 'host', 'genbank_host', 'country', 'moltype']
         meta = meta.reindex(columns = ['strain', 'virus', 'subgenogroup', 'accession', 'seq_len', 'date', 'age', 'sex', 'host', 'genbank_host', 'country', 'moltype'])
 
-    
+    #if genome, find mouse-adapted strain with same name as human, and re-name
+    if args.length=="genome":
+        mouse_samp = meta.loc[meta["accession"] == "MH708882"]
+        meta.loc[meta["accession"] == "MH708882", "strain"] = mouse_samp["strain"]+"-Mouse"
+
     #replace -N/A- with date format that works in augur
     meta.loc[meta.date == '-N/A-', 'date'] = '20XX-XX-XX'
 
@@ -84,7 +91,12 @@ if __name__ == '__main__':
 
     age 5   --> re.search('age [0-9]+$', host)
 
+    1,92 years --> re.search('[0-9]+[,][0-9]+ year', host)
+
     4 years 1 year  3.4 years   --> re.search('[0-9.]+ year', host)
+
+    5 y/o   2 y/o  -->  re.search(' [0-9.]+ y/o', host)
+    BE AWARE of <1 y/o - don't want to process these.
 
     4 months    1 months    1 month  --> re.search('[0-9.]+ month', host)
     """
@@ -113,10 +125,21 @@ if __name__ == '__main__':
             age_month = round(12*float(m.replace("age ","")), 2)
             age_year = float(m.replace("age ",""))
 
+        elif re.search('[0-9]+[,][0-9]+ year', host): #these are always year, with european decimal
+            m = re.search('[0-9]+[,][0-9]+ year', host).group(0)
+            m = m.replace(",",".") #replace m with . and process as below
+            age_month = round(12*float(m.replace(" year","")), 2)
+            age_year = float(m.replace(" year",""))
+
         elif re.search('[0-9.]+ year', host): #these are always year
             m = re.search('[0-9.]+ year', host).group(0)
             age_month = round(12*float(m.replace(" year","")), 2)
             age_year = float(m.replace(" year",""))
+
+        elif re.search(' [0-9.]+ y/o', host): #these are always year
+            m = re.search(' [0-9.]+ y/o', host).group(0)
+            age_month = round(12*float(m.replace(" y/o","")), 2)
+            age_year = float(m.replace(" y/o",""))
 
         elif re.search('[0-9.]+ month', host):
             m = re.search('[0-9.]+ month', host).group(0)
@@ -141,8 +164,15 @@ if __name__ == '__main__':
     #replace countries and remove spaces
     for i, row in meta.iterrows():
         coun = row.country
+        #replace a few countries specifically - add underscores for spaces (so prettify works)
         for c,r in country_replace:
             coun = coun.replace(c,r)
+        coun = prettify(coun, camelCase=True)
+        # de-capitalize small words like 'and' 'of' 'the'
+        for c,r in small_word_replace:
+            coun = coun.replace(c,r)
+        if coun in {'usvi', 'usa', 'uk', 'Usvi', 'Usa', 'Uk'}:
+            coun = coun.upper()
         meta.at[i, 'country'] = coun
 
     #get region if supplied
@@ -153,16 +183,17 @@ if __name__ == '__main__':
         regs = regs[1:] #remove first line
 
         for x in regs:
-            pair = x.split()
-            if len(pair) is not 0:
+            x = x.strip()
+            pair = x.split("\t")
+            if len(pair) > 1:
                 regions[pair[0]] = pair[1]
 
         meta = meta.reindex(columns = ['orig_strain', 'virus', 'subgenogroup', 'accession', 'seq_len', 'date', 'age', 'sex', 'host', 'genbank_host', 'country', 'region', 'moltype', 'strain'])
         newregion = []
         for coun in meta.country:
-            coun = coun.lower()
+            #coun = coun.lower()
             reg = "NA"
-            if coun != "na":
+            if coun != "na" and coun != "Na":
                 if coun not in regions:
                     print("No region found for {}! Setting to NA".format(coun))
                 else:
