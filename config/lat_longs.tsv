@@ -1,0 +1,308 @@
+region	Africa	4.070194	21.824559
+region	China	35.000074	104.999927
+region	Europe	49.646237	10.799454
+region	Japan Korea	35.845119	136.736386
+region	North America	28.2367447	-97.738017
+region	Oceania	-25.0562891	152.008576
+region	South America	-13.083583	-58.470721
+region	South Asia	24.485438	76.513158
+region	Southeast Asia	3.020567	112.390683
+region	West Asia	34.000094	48.732280
+
+country	Afghanistan	33.0	66.0
+country	Albania	41.0	20.0
+country	Algeria	28.0000272	2.9999825
+country	Anguilla	18.21704	-63.05783
+country	American Samoa	-14.27806	-170.7025
+country	Angola	-11.8775767	17.5691241
+country	Argentina	-34.0	-64.0
+country	Armenia	40.18111	44.51361
+country	Aruba	12.512306	-69.975188
+country	Australia	-24.7761085	134.755
+country	Austria	47.2000338	13.199959
+country	Azerbaijan	40.37767	49.89201
+country	Bahamas	25.04082	-77.37122
+country	Bahrain	26.22787	50.58565
+country	Barbados	13.16667	-59.53333
+country	Belarus	53.0	28.0
+country	Bali	-8.3304976	115.0906401
+country	Bangladesh	24.4768783	90.2932426
+country	Belgium	50.6407351	4.66696
+country	Belize	17.49952	-88.19756
+country	Benin	9.668764	2.284078
+country	Bermuda	32.2949	-64.78303
+country	Bhutan	27.5142	90.4336
+country	Bolivia	-17.0	-65.0
+country	Bosnia Herzegovina	43.84864	18.35644
+country	Botswana	-22.199114	24.017975
+country	Brazil	-10.3333332	-53.1999999
+country	Brunei	4.5	114.66667
+country	Bulgaria	42.6073975	25.4856617
+country	Burkina Faso	12.5	-1.66667
+country	Cambodia	13.0	105.0
+country	Cameroon	6.0	12.5
+country	Canada	61.0666922	-107.991707
+country	Canary Islands	20.407566	-15.605260
+country	Cayman Islands	19.323979	-81.138315
+country	Central African Republic	7.0	21.0
+country	Chile	-31.7613364	-71.3187696
+country	China	35.000074	104.999927
+country	Colombia	2.893108	-73.7845142
+country	Cook Islands	-21.24842	-159.78516
+country	Comoros	-12.2045175	44.2832964
+country	Congo	-0.7264326	15.6419155
+country	Costa Rica	10.0	-84.0
+country	Cote D Ivoire	7.9897371	-5.5679457
+country	Croatia	45.16667	15.5
+country	Cuba	22.0	-79.5
+country	Cyprus	35.0	33.0
+country	Czech Republic	49.8175	15.4730
+country	Denmark	56.0	10.0
+country	Djibouti	11.58901	43.14503
+country	Dominica	15.5	-61.33333
+country	Dominican Republic	18.50012	-69.98857
+country	East Timor	-8.5151978	125.8375756
+country	Ecuador	-1.3397667	-79.3666964
+country	Egypt	26.2540493	29.2675469
+country	El Salvador	13.68935	-89.18718
+country	Eritrea	15.9500319	37.9999668
+country	Estonia	59.0	26.0
+country	Ethiopia	9.0	39.5
+country	Fiji	-18.1239695	179.0122737
+country	Finland	63.2467777	25.9209164
+country	France	46.603354	1.8883335
+country	French Guiana	4.93333	-52.33333
+country	French Polynesia	-17.6797	-149.4068
+country	Gabon	-0.8999694	11.6899699
+country	Gambia	13.5	-15.5
+country	Germany	51.0834196	10.4234469
+country	Ghana	8.0300284	-1.080027
+country	Greece	39.0	22.0
+country	Grenada	12.11667	-61.66667
+country	Guadeloupe	16.2650	-61.5510
+country	Guam	13.51777	144.8391
+country	Guatemala	15.6356088	-89.8988086
+country	Guinea	10.7226226	-10.7083586
+country	Guinea Bissau	12.042637	-14.949526
+country	Guyana	5.0	-59.0
+country	Haiti	19.1399952	-72.3570971
+country	Honduras	15.0610686	-84.5978533
+country	Hong Kong	22.3964	114.1095
+country	Hungary	47.0	20.0
+country	Iceland	64.9841821	-18.1059012
+country	India	22.3511148	78.6677428
+country	Indonesia	-5.0	120.0
+country	Iran	32.0	53.0
+country	Iraq	33.0	44.0
+country	Ireland	52.865196	-7.9794598
+country	Israel	31.5	34.75
+country	Italy	42.6384261	12.674297
+country	Jamaica	18.16667	-77.25
+country	Japan	35.68536	139.75309
+country	Jordan	31.1667049	36.941628
+country	Kazakhstan	47.2286086	65.2093197
+country	Kenya	1.0	38.0
+country	Kosovo	42.563516	20.889978
+country	Kuwait	29.3117	47.4818
+country	Kyrgyzstan	41.5	75.0
+country	Laos	20.0171109	103.378253
+country	Latvia	57.0	25.0
+country	Lebanon	33.88894	35.49442
+country	Liberia	5.7499721	-9.3658523
+country	Lithuania	55.41667	24.0
+country	Luxembourg	49.61167	6.13
+country	Macedonia	41.66667	21.75
+country	Madagascar	-20.0	47.0
+country	Malawi	-13.550995	34.124594
+country	Malaysia	2.3923759	112.8471939
+country	Maldives	4.7064352	73.3287853
+country	Mali	18.0	-2.0
+country	Malta	35.891045	14.441412
+country	Marshall Islands	7.1315	171.1845
+country	Martinique	14.6415	-61.0242
+country	Mauritania	20.25	-10.5
+country	Mauritius	-20.3	57.58333
+country	Mayotte	-12.821908	45.143906
+country	Mexico	19.4325301	-99.1332101
+country	Micronesia	6.924	158.162
+country	Moldova	47.412810	28.565826
+country	Mongolia	46.8250388	103.8499736
+country	Montenegro	43.0285558	19.291739
+country	Morocco	31.1728192	-7.3366042
+country	Mozambique	-18.25	35.0
+country	Myanmar	21.0	96.0
+country	Nauru	-0.517	166.933
+country	Nepal	28.0	84.0
+country	Netherlands	52.3702	4.8952
+country	New Caledonia	-20.9043	165.6180
+country	New Zealand	-41.500083	172.8344077
+country	Nicaragua	13.0	-85.0
+country	Niger	18.0	9.0
+country	Nigeria	10.0	8.0
+country	Northern Mariana Islands	15.21233	145.7545
+country	Norway	64.574131	11.5270102892
+country	Oman	21.0000287	57.0036901
+country	Pakistan	30.0	70.0
+country	Palau	7.33978	134.47326
+country	Palestine	31.5	34.46667
+country	Panama	8.3096067	-81.3066245
+country	Papua New Guinea	-6.0	147.0
+country	Paraguay	-23.33333	-58.0
+country	Peru	-10.0	-75.25
+country	Philippines	12.8797	121.7740
+country	Poland	52.0977181	19.0258159
+country	Portugal	39.6945	-8.13057
+country	Puerto Rico	18.2459121	-66.4164147
+country	Qatar	25.27932	51.52245
+country	Romania	46.0	25.0
+country	Russia	64.6863136	97.7453061
+country	Rwanda	-2.0	30.0
+country	Saint Barthelemy	17.9049171	-62.847207
+country	Saint Kitts	17.29484	-62.7261
+country	Saint Lucia	13.88333	-60.96667
+country	Saint Vincent and the Grenadines	12.9843	-61.2872
+country	Saudi Arabia	25.0	45.0
+country	Senegal	14.5	-14.25
+country	Serbia	44.1534121	20.55144
+country	Seychelles	-4.58333	55.66667
+country	Sierra Leone	8.5	-11.5
+country	Singapore	1.2904527	103.852038
+country	Slovakia	48.66667	19.5
+country	Slovenia	45.8133113	14.4808369
+country	Solomon Islands	-8.0	159.0
+country	Somalia	8.3676771	49.083416
+country	South Africa	-28.8166235	24.991639
+country	South Korea	35.3985008	127.937111
+country	Spain	40.0028028	-4.0031039
+country	Sri Lanka	7.75	80.75
+country	Sudan	16.0	30.0
+country	Suriname	4.1413025	-56.0771186
+country	Sweden	59.6749712	14.5208584
+country	Switzerland	47.00016	8.01427
+country	Taiwan	23.6978	120.9605
+country	Tajikistan	39.0	71.0
+country	Tanzania	-6.0	35.0
+country	Thailand	14.8971921	100.83273
+country	Tibet	31.129337	88.671049
+country	Togo	8.66667	1.08333
+country	Tonga	-19.9160818	-175.2026423
+country	Trinidad and Tobago	10.8677845	-60.9821066
+country	Tunisia	36.81897	10.16579
+country	Turkey	39.0	35.0
+country	Turkmenistan	39.3763807	59.3924609
+country	Turks and Caicos	21.73333	-71.58333
+country	Tuvalu	-8.521152	179.197605
+country	Uruguay	-33.0	-56.0
+country	Uganda	1.5333554	32.2166578
+country	Ukraine	49.4871968	31.2718321
+country	United Arab Emirates	24.0002488	53.9994829
+country	United Kingdom	54.542713	-2.384858
+country	USA	39.7837304	-100.4458824
+country	USVI	18.3378801	-64.8982827
+country	Vanuatu	-17.734818	168.3220
+country	Venezuela	8.0	-66.0
+country	Vietnam	16.16667	107.83333
+country	Wallis and Futuna	-13.28163	-176.17453
+country	Yemen	16.3471243	47.8915271
+country	Zambia	-14.33333	28.5
+country	Zimbabwe	-19.307486	29.7968377
+
+division	Alabama	33.2588817	-86.8295336
+division	Alaska	64.4459613	-149.6809089
+division	Arizona	34.395342	-111.7632754
+division	Arkansas	35.2048883	-92.4479107
+division	Beyla	8.6898481	-8.6483449
+division	Bo	7.9620654	-11.7366498
+division	Boke	10.952242	-14.2760634
+division	Bombali	9.2388372	-12.1148023
+division	Bomi	6.7177856	-10.7881765
+division	Bong	6.9622195	-9.7134458
+division	Bonthe	7.5292766	-12.5131865
+division	British Columbia	49.24966	-123.11934
+division	California	36.7014631	-118.7559973
+division	Colorado	38.7251776	-105.6077166
+division	Conakry	9.5171253	-13.6999234
+division	Connecticut	41.6500201	-72.7342162
+division	Coyah	9.7090404	-13.3889559
+division	Dalaba	10.6913277	-12.2512594
+division	Delaware	38.6920451	-75.4013314
+division	Dubreka	9.7889586	-13.5171217
+division	Faranah	10.3143203	-10.8900969
+division	Florida	27.7567667	-81.4639834
+division	Forecariah	9.4300088	-13.0833858
+division	Fria	10.363036	-13.5811849
+division	Gbarpolu	7.2681564	-10.381477
+division	Georgia	32.3293809	-83.1137365
+division	Grand Bassa	6.1640621	-9.8956689
+division	Grand Cape Mount	7.0496206	-11.1298429
+division	Grand Kru	4.84932	-8.3308844
+division	Gueckedou	8.5616487	-10.1328211
+division	Hawaii	21.2160437	-157.9752029
+division	Idaho	43.6447642	-114.015407
+division	Illinois	40.0796319	-89.4339808
+division	Indiana	40.3270127	-86.1746932
+division	Iowa	41.9216734	-93.3122704
+division	Kailahun	8.2769105	-10.5737535
+division	Kambia	9.1246846	-12.9189133
+division	Kankan	10.3833686	-9.3047575
+division	Kansas	38.27312	-98.5821871
+division	Kenema	7.8859356	-11.1863898
+division	Kentucky	37.5726028	-85.155141
+division	Kerouane	11.4231137	-9.5938615
+division	Kindia	10.0492476	-12.8577996
+division	Kissidougou	9.2101274	-10.1215916
+division	Koinadugu	9.3727454	-11.3253108
+division	Kono	8.6868883	-10.9194453
+division	Kouroussa	10.6519303	-9.8811521
+division	Lofa	7.8824046	-9.9760296
+division	Lola	8.0166961	-8.30784246327
+division	Louisiana	30.8703881	-92.0071259
+division	Macenta	8.5458459	-9.4679199
+division	Maine	45.709097	-68.85902
+division	Manitoba	49.8844	-97.14704
+division	Margibi	6.6053676	-10.1758428
+division	Maryland	39.5162234	-76.9382068
+division	Massachusetts	42.3788774	-72.0323659
+division	Michigan	43.6211955	-84.6824345
+division	Minnesota	45.9896587	-94.6113287
+division	Mississippi	32.9715645	-89.7348496
+division	Montana	47.3752671	-109.6387578
+division	Montserrado	6.4095537	-10.6059402
+division	Moyamba	8.159153	-12.4314373
+division	Nebraska	41.7370229	-99.5873815
+division	Nevada	39.5158825	-116.8537226
+division	New Hampshire	43.4718339	-71.6182147
+division	New Mexico	34.5708167	-105.9930069
+division	New York	40.7642499	-73.9545249
+division	Nimba	6.8088813	-8.7461447
+division	New Jersey	40.0757384	-74.4041621
+division	North Carolina	35.6729639	-79.0392918
+division	North Dakota	47.6201461	-100.5407369
+division	Nzerekore	7.7579345	-8.8176067
+division	Ohio	40.2253569	-82.6881394
+division	Oklahoma	34.9550817	-97.2684062
+division	Ontario	50.0000002	-86.0
+division	Oregon	43.9792797	-120.7372569
+division	Pennsylvania	40.9699889	-77.727883
+division	Port Loko	8.7638892	-12.7799026
+division	Pujehun	7.35633	-11.722668
+division	River Gee	5.2653903	-7.8856202
+division	Rivercess	5.9087331	-9.3938266
+division	Scotland	56.7861112	-4.1140517
+division	Siguiri	11.4189557	-9.1745795
+division	Sinoe	5.3232693	-8.8435954
+division	South Carolina	33.6874388	-80.4363742
+division	South Dakota	44.6471761	-100.3487609
+division	Tennessee	35.7730076	-86.282008
+division	Texas	31.8160381	-99.5120985
+division	Tonkolili	8.979884	-11.717715
+division	Utah	39.4225192	-111.7143583
+division	Vermont	44.5990718	-72.5002607
+division	Virginia	37.1232245	-78.492772
+division	Washington	47.60	-122.33
+division	West Virginia	38.4758406	-80.8408414
+division	Western Area	8.33461895	-13.0659143446
+division	Western Rural	8.320091	-13.0588080718
+division	Western Urban	8.4365934	-13.239469946
+division	Wisconsin	44.4308975	-89.6884636
+division	Wyoming	43.1700264	-107.5685347

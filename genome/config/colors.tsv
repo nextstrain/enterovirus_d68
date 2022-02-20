@@ -1,39 +1,39 @@
-country	japan	#996633
-country	canada	#9a2219
-country	usa	#DC2F24
-country	mexico	#dc6024
-country	haiti	#f79203
-country	new_zealand	#FFCC00
-country	denmark	#cbee5b
-country	sweden	#74ee5b
-country	switzerland	#2dc30e
-country	france	#339933
-country	spain	#058360
-country	belgium	#045e45
-country	netherlands	#003311
-country	china	#511EA8
-country	hong_kong	#4928B4
-country	taiwan	#4334BF
-country	vietnam	#527CCE
-country	philippines	#528EB1
-country	india	#3399FF
-country	kenya	#680AC7
-country	tanzania	#9933FF
-country	canary_islands	#ff00ff
-country	united_kingdom	#66ffcc
+country	Japan	#996633
+country	Canada	#9a2219
+country	USA	#DC2F24
+country	Mexico	#dc6024
+country	Haiti	#f79203
+country	New Zealand	#FFCC00
+country	Denmark	#cbee5b
+country	Sweden	#74ee5b
+country	Switzerland	#2dc30e
+country	France	#339933
+country	Spain	#058360
+country	Belgium	#045e45
+country	Netherlands	#003311
+country	China	#511EA8
+country	Hong Kong	#4928B4
+country	Taiwan	#4334BF
+country	Vietnam	#527CCE
+country	Philippines	#528EB1
+country	India	#3399FF
+country	Kenya	#680AC7
+country	Tanzania	#9933FF
+country	Canary Islands	#ff00ff
+country	United Kingdom	#66ffcc
 
-region	japan_korea	#996633
-region	north_america	#DC2F24
-region	oceania	#FFCC00
-region	europe	#339933
-region	china	#511EA8
-region	southeast_asia	#527CCE
-region	south_asia	#3399FF
-region	africa	#9933FF
+region	Japan Korea	#996633
+region	North America	#DC2F24
+region	Oceania	#FFCC00
+region	Europe	#339933
+region	China	#511EA8
+region	Southeast Asia	#527CCE
+region	South Asia	#3399FF
+region	Africa	#9933FF
 
-study	sweden	#88419d
-study	belgium	#fd8d3c
-study	netherlands	#0570b0
+study	Sweden	#88419d
+study	Belgium	#fd8d3c
+study	Netherlands	#0570b0
 
 age_range1	<1y	#d7191c
 age_range1	1-5y	#fdae61
@@ -48,11 +48,11 @@ age_range2	>=65y	#2c7bb6
 age_range3	<18y	#d7191c
 age_range3	>=18y	#2c7bb6
 
-source1	spain	#ff0000
-sourc1e	sweden	#88419d
-sourc1e	netherlands	#fd8d3c
-sourc1e	belgium	#0570b0
-sourc1e	switzerland	#00b050
+source1	Spain	#ff0000
+sourc1e	Sweden	#88419d
+sourc1e	Netherlands	#fd8d3c
+sourc1e	Belgium	#0570b0
+sourc1e	Switzerland	#00b050
 
 sympto1m	AFM	#ff0000
 sympto1m	limb_weakness	#fd8d3c

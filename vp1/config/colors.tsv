@@ -1,11 +1,11 @@
-region	japan_korea	#996633
-region	north_america	#DC2F24
-region	oceania	#FFCC00
-region	europe	#339933
-region	china	#511EA8
-region	southeast_asia	#527CCE
-region	south_asia	#3399FF
-region	africa	#9933FF
+region	Japan Korea	#996633
+region	North America	#DC2F24
+region	Oceania	#FFCC00
+region	Europe	#339933
+region	China	#511EA8
+region	Southeast Asia	#527CCE
+region	South Asia	#3399FF
+region	Africa	#9933FF
 
 age_range1	<1y	#d7191c
 age_range1	1-5y	#fdae61
@@ -65,13 +65,13 @@ CTERM	RERANEVTHDIT	#9A6324
 CTERM	many x	#6d6c6c
 CTERM	other	#a9a9a9
 
-#collab_country	denmark	#3177eb
-#collab_country	netherlands	#5eb1cc
-#collab_country	switzerland	#85cdb8
-#collab_country	belgium	#add65a
-#collab_country	germany	#ebf44a
-#collab_country	sweden	#ebcd4a
-#collab_country	spain	#ffa03d
-#collab_country	france	#fc72c4
+#collab_country	Denmark	#3177eb
+#collab_country	Netherlands	#5eb1cc
+#collab_country	Switzerland	#85cdb8
+#collab_country	Belgium	#add65a
+#collab_country	Germany	#ebf44a
+#collab_country	Sweden	#ebcd4a
+#collab_country	Spain	#ffa03d
+#collab_country	France	#fc72c4
 #collab_country		#c80eb7
 #collab_country		#f41507
