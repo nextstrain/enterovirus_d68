@@ -78,7 +78,8 @@
     "age_range1", 
     "age_range3",
     "symptom",
-    "collab_country"
+    "collab_country",
+    "date_added"
   ],
   "panels": [
     "tree",
