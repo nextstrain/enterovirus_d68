@@ -10,7 +10,10 @@ Note that the data used for these runs is *not* part of this repository. You can
 ### Setup
 To run automatically-downloaded VP1 sequences with this pipeline, you'll need to install local BLAST for this analysis to work. Do this with: 
 `sudo apt-get install ncbi-blast+`
-_(is this right?)_
+
+Files downloaded in tab-delimited format from ViPR will need to be decompressed to `.tsv` format before running the workflow (the workflow cannot handle `.tar.gz` files). In Linux, you can do this with a command similar to `tar -xvzf Results.tar.gz`.
+
+You should move the file into the `genome/data/` or `vpi/data/` folder and ensure its location and name matches up what is present in the [input file part of the Snakefile](https://github.com/nextstrain/enterovirus_d68/blob/master/Snakefile#L101) (replacing `data/entero-30Jan18.tsv` or similar).
 
 #### For Full-Genome Run
 Download in _tab delimited format_ all samples that are Enterovirus -> Enterovirus D -> Enterovirus D68 using ViPR's search function, with sequence length min:6400, max:8000.
@@ -21,8 +24,6 @@ _(Using the 'full genome' tick-box will result in fewer sequences)_
 
 #### For VP1 Run
 Download in _tab delimited format_ all samples that are Enterovirus -> Enterovirus D -> Enterovirus D68 using ViPR's search function, without restriction on sequence length or dates. (There should be over 3,000.) 
-
-Place this file in the `data` folder of `vp1` or `genome`, and include the name of that file in the Snakefile (replacing `data/entero-30Jan18.tsv` or similar). 
 
 **Until the re-run feature is re-implemented parsed, cleaned, and BLAST-ed GenBank sequences & metadata need to go into the `vp1` or `genome` 'genbank' folder as `genbank_meta.tsv` and `genbank_sequences.fasta`.**
 
