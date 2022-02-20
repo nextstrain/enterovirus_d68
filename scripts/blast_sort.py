@@ -45,8 +45,9 @@ if __name__ == '__main__':
     keep_meta_forbid_names = []
     for f in meta.strain:
         name = f
-        for c,r in forbidden_characters:
-            name=name.replace(c,r)
+        #for c,r in forbidden_characters:
+        #    name=name.replace(c,r)
+        name = name.translate(forbidden_characters)
         meta.loc[meta.strain == f, "qseqid"] = name
         if name in keep_blast:
             keep_meta_forbid_names.append(f)
