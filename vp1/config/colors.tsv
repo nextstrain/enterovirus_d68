@@ -1,11 +1,52 @@
 region	Japan Korea	#996633
 region	North America	#DC2F24
+region	South America	#f19d00
 region	Oceania	#FFCC00
 region	Europe	#339933
 region	China	#511EA8
-region	Southeast Asia	#527CCE
+region	Southeast Asia	#050080
+region	West Asia	#527CCE
 region	South Asia	#3399FF
 region	Africa	#9933FF
+
+country	USA	#F3BC00
+country	Canada	#F3CE00
+country	Mexico	#F3DF00
+country	Haiti	#F3F100
+
+country	Ireland	#35F5FF
+country	United Kingdom	#2DCCEA
+country	Spain	#25A3D5
+country	France	#1D7BC0
+country	Netherlands	#1552AA
+country	Belgium	#0D2995
+country	Germany	#050080
+country	Switzerland	#350090
+country	Italy	#4D0099
+country	Sweden	#6400A1
+country	Denmark	#7C00A9
+country	Finland	#9400B1
+
+country	Senegal	#00F366
+country	Gambia	#23E244
+country	Guinea	#46D022
+country	Niger	#69BF00
+country	South Africa	#4BAB00
+country	Tanzania	#2C9600
+country	Kenya	#0E8200
+
+country	India	#FF359C
+country	Thailand	#FC2875
+country	Malaysia	#F91B4E
+country	Vietnam	#F60D27
+country	China	#F30000
+country	Hong Kong	#F32200
+country	Taiwan	#F34400
+country	Philippines	#F36500
+country	Japan	#F38700
+
+country	New Zealand	#996633
+country	Australia	#c37509
 
 age_range1	<1y	#d7191c
 age_range1	1-5y	#fdae61
@@ -29,6 +70,7 @@ BC	NAEQTF	#f032e6
 BC	NAERTF	#42d4f4
 BC	NTERVY	#3cb44b
 BC	NTERIY	#ffe119
+BC	NTGRIY	#469990
 BC	NTERTY	#e6194B
 BC	NTERTF	#9A6324
 BC	other	#a9a9a9
@@ -38,6 +80,10 @@ DE	NGSSNNTYM	#42d4f4
 DE	NGSSSNTYM	#f032e6
 DE	NDSSNNTYM	#ffe119
 DE	NGSSNNTYV	#e6194B
+DE	NGGSNNTYV	#f7adec
+DE	SGSSNNTYV	#6b4519
+DE	NDSSNNTYV	#f8a46a
+DE	NGSSN-TYV	#b1ffdf
 DE	NGSGNNTYV	#3cb44b
 DE	NGSSNNAYV	#bfef45
 DE	NGSSNNSYV	#911eb4
@@ -52,10 +98,12 @@ DE	other	#a9a9a9
 CTERM	KEKANDVTHNIT	#f58231
 CTERM	KERASDVTHNIT	#42d4f4
 CTERM	KERASDVTHNIN	#f032e6
+CTERM	KERANDVTHNIN	#f8a46a
 CTERM	KERANNVTHNIT	#ffe119
 CTERM	KDRANDVTHNIT	#e6194B
 CTERM	KKRANDVTHNIT	#bfef45
 CTERM	KERANDVTHNIT	#3cb44b
+CTERM	KERANGVTHNIT	#6b4519
 CTERM	RDRANDVTHNIT	#911eb4
 CTERM	RERANDVTHNIT	#4363d8
 CTERM	KERANEITHDLN	#000075

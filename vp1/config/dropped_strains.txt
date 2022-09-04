@@ -48,3 +48,17 @@ SH2808__KU242684 #end of this seq is very bad & cant be aligned
 HEV156010__KJ472882 # has A LOT of mutations at end - doesnt seem recomb - don't match w any other seq
 HEV137010__KJ472885 # has A LOT of mutations at end - doesnt seem recomb - don't match w any other seq
 2016-R6091 # very divergent - sequence not terrible. full genome fine. shares muts at end w 2016-R4460
+IRN11__MH250145 #very divergent
+USA/KY/2014-20238__MF160035 #very divergent
+MY/2020/2195087__MZ384008 #very divergent
+SP_DEC14_12660_R__MN403127 #lots of missing bases, divergent
+SP_OCT14_41429_R__MN403260 #lots of missing bases, divergent
+SP_NOV14_47091_R__MN403255 #lots of missing bases, divergent
+SP_DEC14_12655_R__MN403126 #lots of missing bases, divergent
+EV-D68/human/Germany/LE-A61GHD3/2016__MW731827 #lots of missing bases, divergent
+EVD68_Capsid_ENG_Sep21c #identical to SWG_ENG_Sep21c, so exclude (longer seq, if needed another time!)
+EVD68_Capsid_ENG_Oct21c #identical to SWG_ENG_Oct21c, so exclude (longer seq, if needed another time!)
+EVD68_Capsid_ENG_Sep21a #identical to SWG_ENG_Sep21a, so exclude (longer seq, if needed another time!)
+EVD68_Capsid_ENG_Oct21d #identical to SWG_ENG_Oct21d, so exclude (longer seq, if needed another time!)
+EVD68_Capsid_ENG_Oct21e #identical to SWG_ENG_Oct21e, so exclude (longer seq, if needed another time!)
+EVD68_Capsid_ENG_Sep21e #identical to SWG_ENG_Sep21e, so exclude (longer seq, if needed another time!)
