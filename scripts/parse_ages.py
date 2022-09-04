@@ -80,6 +80,10 @@ if __name__ == '__main__':
                 meta.loc[meta.accession == row.accession, 'sex'] = row.sex.strip()
             if not pd.isnull(row.symptom):
                 meta.loc[meta.accession == row.accession, 'symptom'] = row.symptom.strip()
+            if not pd.isnull(row.country):
+                meta.loc[meta.accession == row.accession, 'country'] = row.country.strip()
+            if not pd.isnull(row.region):
+                meta.loc[meta.accession == row.accession, 'region'] = row.region.strip()
 
             #0.8    years   leave
             #77     years   leave
