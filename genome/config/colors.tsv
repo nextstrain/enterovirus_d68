@@ -1,9 +1,11 @@
-country	Japan	#996633
+country	Japan	#5b3d1e
+country	New Zealand	#996633
+country	Australia	#c37509
 country	Canada	#9a2219
 country	USA	#DC2F24
 country	Mexico	#dc6024
 country	Haiti	#f79203
-country	New Zealand	#FFCC00
+country	United Kingdom	#FFCC00
 country	Denmark	#cbee5b
 country	Sweden	#74ee5b
 country	Switzerland	#2dc30e
@@ -20,7 +22,6 @@ country	India	#3399FF
 country	Kenya	#680AC7
 country	Tanzania	#9933FF
 country	Canary Islands	#ff00ff
-country	United Kingdom	#66ffcc
 
 region	Japan Korea	#996633
 region	North America	#DC2F24
