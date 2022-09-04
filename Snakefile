@@ -24,7 +24,8 @@ wildcard_constraints:
     length="vp1|genome",
     min_len="|_[0-9]+",
     max_year="|_20[0-9]{2}[y]|_19[0-9]{2}[y]",
-    gene="|-vp4|-vp2|-vp3|-vp1|-2A|-2B|-2C|-3A|-3B|-3C|-3D"
+    gene="|-vp4|-vp2|-vp3|-vp1|-2A|-2B|-2C|-3A|-3B|-3C|-3D",
+    date="|-[0-9]{2}[A-z]+[0-9]{2,4}"
     #from: https://bitbucket.org/snakemake/snakemake/issues/910/empty-wildcard-assignment-works-only-if
 
 ###EXAMPLE RUNS:
@@ -50,6 +51,11 @@ wildcard_constraints:
 #To combine two things (300bp filter and 2018 sequences):
 # snakemake "vp1/auspice/enterovirus_d68_vp1_300_2018y.json"
 
+#To date a run at the end, so it's distingishable in the auspice folder:
+# snakemake "genome/auspice/enterovirus_d68_genome-15Feb22.json" 
+# or
+# snakemake "genome/auspice/enterovirus_d68_genome-15Feb2022.json"
+
 #To run all genes in genome: (some are too short and will fail) with default settings
 # snakemake genome_genes
 
@@ -64,15 +70,15 @@ rule vp1:
     input:
         #auspice_tree = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_tree.json",
         #auspice_meta = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_meta.json"
-        auspice_out = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}.json",
-        tip_freq_out = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}_tip-frequencies.json"
+        auspice_out = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}{date}.json",
+        tip_freq_out = "{length}/auspice/enterovirus_d68_vp1{gene}{min_len}{max_year}{date}_tip-frequencies.json"
 
 rule genome:
     input:
         #auspice_tree = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_tree.json",
         #auspice_meta = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_meta.json"
-        auspice_out = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}.json",
-        tip_freq_out = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}_tip-frequencies.json"
+        auspice_out = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}{date}.json",
+        tip_freq_out = "{length}/auspice/enterovirus_d68_genome{gene}{min_len}{max_year}{date}_tip-frequencies.json"
 
 GENES = ["-vp4","-vp2","-vp3","-vp1","-2A","-2B","-2C","-3A","-3B","-3C","-3D"]
 rule genome_genes:
@@ -96,10 +102,17 @@ rule default_genome:
         auspice_out = "genome/auspice/enterovirus_d68_genome.json",
         tip_freq_out = "genome/auspice/enterovirus_d68_genome_tip-frequencies.json"
 
+rule default_vp1_date:
+    input:
+        auspice_out = "vp1/auspice/enterovirus_d68_vp1{date}.json",
+        tip_freq_out = "vp1/auspice/enterovirus_d68_vp1{date}_tip-frequencies.json"
+
 rule files:
     input:
-        raw_vipr_genome = "genome/data/genomeEntero-22Jan20.tsv", #raw VIPR download!
-        raw_vipr_vp1 = "vp1/data/allEntero-22Jan20.tsv", #raw VIPR download!
+        #raw_vipr_genome = "genome/data/genomeEntero-22Jan20.tsv", #raw VIPR download!
+        raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
+        #raw_vipr_vp1 = "vp1/data/allEntero-22Jan20.tsv", #raw VIPR download!
+        raw_vipr_vp1 = "vp1/data/allEntero-03Sep22.tsv", #raw VIPR download!
         
         #samples sequenced in Sweden
         swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
@@ -123,8 +136,8 @@ rule files:
         clades = "{length}/config/clades.tsv",
         auspice_config = "{length}/config/auspice_config.json",
         colors = "{length}/config/colors.tsv",
-        lat_long = "{length}/config/lat_longs.tsv",
-        regions = "scripts/geo_regions.tsv",
+        lat_long = "config/lat_longs.tsv",
+        regions = "config/geo_regions.tsv",
         blast_ref = "vp1/config/ev_d68_reference_vp1.fasta"
 
 files = rules.files.input
@@ -205,10 +218,15 @@ rule download_seqs:
         meta = "{length}/temp/downloaded_meta.tsv"
     run:
         import pandas as pd
+        import os
         from Bio import Entrez, SeqIO
+        from dotenv import load_dotenv, find_dotenv
         from augur.parse import forbidden_characters
         from datetime import datetime
-        Entrez.email = "richard.neher@unibas.ch"
+
+        load_dotenv(find_dotenv())
+        Entrez.email = os.environ.get("EMAIL")
+        #email address should be stored in an .env file in the base directory, in the format EMAIL=user@email.com
 
         print(input.meta)
         meta = pd.read_csv(input.meta, sep='\t')
@@ -246,8 +264,7 @@ rule download_seqs:
                 add_date = datetime.today().strftime('%Y-%m-%d')
                 additional_meta[ri] = {'url':url, 'authors':authors, 'title':title, 'date_added':add_date}
                 tmp = row.strain
-                for c,r in forbidden_characters:
-                    tmp=tmp.replace(c,r)
+                tmp = tmp.translate(forbidden_characters)
                 rec.id = tmp
                 rec.name = tmp
                 rec.description = ''
@@ -378,8 +395,7 @@ rule add_meta:
             tmp_name = []
             for x in tmp.strain:
                 f = x
-                for c,r in forbidden_characters:
-                    f=f.replace(c,r)
+                f = f.translate(forbidden_characters)
                 tmp_name.append(f)
             tmp.strain = tmp_name
             md.append(tmp)
@@ -476,8 +492,7 @@ rule concat_meta:
             tmp_name = []
             for x in tmp.strain:
                 f = x
-                for c,r in forbidden_characters:
-                    f=f.replace(c,r)
+                f = f.translate(forbidden_characters)
                 tmp_name.append(f)
             tmp.strain = tmp_name
             md.append(tmp)
@@ -517,82 +532,115 @@ rule add_age:
 # now run usual augur analysis
 ###############################
 
+def _use_300_include(wildcards):
+    if wildcards.length == "vp1" and wildcards.min_len == "_300":
+        return files.kept_strains_300
+    else:
+        return files.kept_strains
+
+def _subsample_amount_per_group(wildcards):
+    if wildcards.length == "vp1":
+        if rules.filter.params.categories == "country year month": #doing by year and month
+            return 20
+        else: #doing by just year - multiply month amount by 12
+            return 20*12
+    else:
+        if rules.filter.params.categories == "country year month": #doing by year and month
+            return 200
+        else: #doing by just year - multiply month amount by 12
+            return 200*12
+
+def _minimum_filter_length(wildcards):
+    if wildcards.min_len: #if specify a length, use it
+        return wildcards.min_len.replace("_","")
+    else: #otherwise use the defaults
+        if wildcards.length == "vp1":
+            return "700"
+        else:
+            return "6000"
+
+def _filter_length_message(wildcards):
+    if wildcards.min_len: #if specify a length, use it
+        minl = wildcards.min_len.replace("_","")
+        return f"Filtering with minimum length argument of {minl}"
+    else: #otherwise use the defaults
+        if wildcards.length == "vp1":
+            return "Filtering with default VP1 minimum length of 700"
+        else:
+            return "Filtering with default full-genome minimum length of 6000"
+
+def _max_year_argument(wildcards):
+    if wildcards.max_year: #if specified, use it
+        maxyr = int(wildcards.max_year.replace("_","").replace("y",""))
+        realmaxyr = maxyr + 1 #increment by 1 to include the whole year specified
+        return f"--max-date {realmaxyr}"
+    else: #otherwise, don't
+        return ""
+
+def _max_year_message(wildcards):
+    if wildcards.max_year: #if specified, use it
+        maxyr = int(wildcards.max_year.replace("_","").replace("y",""))
+        realmaxyr = maxyr + 1 #increment by 1 to include the whole year specified
+        return f"Filtering with a max year argument of {maxyr} (This is passed to augur as {realmaxyr})"
+    else: #otherwise, don't
+        return "Filtering without maximum year argument"
+
 rule filter:
+    message:
+        """
+        WARNING SUBSAMPLING BY GROUP BY FOR MONTHS IS CURRENTLY TURNED OFF!
+        UNTIL CAN RE-IMPLEMENT MISSING DATE FILTERING!
+
+        Subsample sequences:
+            {params.filter_message}
+            Using categories '{params.categories}'
+            Subsampling by {params.sequences_per_category} per category
+            Minimum date is {params.min_date}
+            {params.maxyear_message}
+
+        Parameters:
+        --min-length {params.min_length}
+        --group-by {params.categories}
+        --include {input.include}
+        --sequences-per-group {params.sequences_per_category}
+        --min-date {params.min_date}
+        {params.max_year}
+
+        Reasons for filtering are output to {output.reasons}
+        """
     input:
         sequences = rules.concat_sequences.output, #"{length}/results/sequences.fasta",
         metadata = rules.add_age.output.meta,
         exclude = files.dropped_strains,
-        include = files.kept_strains,
-        include_300 = files.kept_strains_300 #special include for 300bp run, until do better filtering
+        include = _use_300_include
+        #include = files.kept_strains,
+        #include_300 = files.kept_strains_300 #special include for 300bp run, until do better filtering
     output:
-        sequences = "{length}/results/filtered{min_len}{max_year}.fasta"
+        sequences = "{length}/results/filtered{min_len}{max_year}.fasta",
+        reasons = "{length}/results/filtering{min_len}{max_year}_reasons.tsv"
     params:
-        #sequences_per_category = 20,
-        categories = "country year month",
+        filter_message = _filter_length_message,
+        maxyear_message = _max_year_message,
+        sequences_per_category = _subsample_amount_per_group,
+        min_length = _minimum_filter_length,
+        max_year = _max_year_argument,
+        #categories = "country year month",  #off until can figure out how to include those without month
+        categories = "country year", 
         min_date = 1990, #change to 1950 to include 1962 seq
     shell:
         """
-        # Figure out what min seq per category to use
-        if [ "{wildcards.length}" == "genome" ]; then
-            echo "Subsampling by 200 per category"
-            seq_per_group="--sequences-per-group 200"
-        else
-            echo "Subsampling by 20 per category"
-            seq_per_group="--sequences-per-group 20"
-        fi
-
-        # Figure out what max year to use
-        mxyr="{wildcards.max_year}"
-        if [ -z "$mxyr" ]; then
-            echo "Filtering without maximum year argument"
-            maxyeararg=""
-        else
-            maxyr="${{mxyr//[_y]/}}"
-            echo "Filtering with maximum year argument of $maxyr"
-            realmaxyr="$(($maxyr+1))"
-            maxyeararg="--max-date $realmaxyr"
-            echo "   This is passed to augur as $maxyeararg"
-        fi
-
-        # Figure out minimum filter length to use
-        WCD="{wildcards.min_len}"
-        if [ -z "$WCD" ]
-        then
-            if [ "{wildcards.length}" == "vp1" ]
-            then
-                echo "Filtering with default VP1 minimum length of 700"
-                minlen="--min-length 700"
-            else
-                echo "Filtering with full-genome minimum length of 6000"
-                minlen="--min-length 6000"
-            fi
-        else
-            echo "Filtering with minimum length argument of ${{WCD//_/}}"
-            minlen="--min-length ${{WCD//_/}}"
-            # echo $minlen
-        fi
-
-        # Use special kept-strains file if 300bp run - until I get better filtering in place
-        if [ "${{WCD//_/}}" == 300 ]; then
-            echo "Using special 'kept_strains' file for 300bp run."
-            includefile="--include {input.include_300}"
-        else
-            echo "Using normal 'kept_strains' file."
-            includefile="--include {input.include}"
-        fi
-
         augur filter --sequences {input.sequences} --metadata {input.metadata} \
             --output {output.sequences} \
+            --exclude {input.exclude} \
+            --min-date {params.min_date} \
             --group-by {params.categories} \
-            $seq_per_group \
-            --exclude {input.exclude}  --min-date {params.min_date} \
-            $maxyeararg \
-            $includefile \
-            $minlen
+            --sequences-per-group {params.sequences_per_category} \
+            {params.max_year} \
+            --include {input.include} \
+            --min-length {params.min_length} \
+            --output-log {output.reasons}
         """
-        #--sequences-per-group {params.sequences_per_category} \
-        # MINLEN=${ $WCD | sed -r 's/_//g' }
-        #--include {input.include} \
+
 
 rule align:
     input:
@@ -659,7 +707,7 @@ rule refine:
             --metadata {input.metadata} \
             --output-tree {output.tree} --output-node-data {output.node_data} \
             --timetree --date-confidence --date-inference marginal --coalescent opt \
-            --branch-length-inferece marginal \
+            --branch-length-inference marginal \
             --clock-filter-iqd {params.clock_filter_iqd}
         """
         # Have set --branch-length-inference to 'marginal' on recommendation of TreeTime warning when ran on auto
@@ -763,7 +811,7 @@ rule tip_frequencies:
         tree = rules.refine.output.tree,
         metadata=rules.add_age.output.meta,
     output:
-        tip_frequencies_json = "{length}/auspice/enterovirus_d68_{length}{gene}{min_len}{max_year}_tip-frequencies.json"
+        tip_frequencies_json = "{length}/auspice/enterovirus_d68_{length}{gene}{min_len}{max_year}{date}_tip-frequencies.json"
     params:
         min_date = "1987-01-01",
         max_date = _get_max_date_for_frequencies,
@@ -829,7 +877,7 @@ rule epitopes:
             nodes[n] = {}
             for epi,pos in params.epitopes.items():
                 nodes[n][epi] = "".join([aa[p] for p in pos])
-                if epi is 'CTERM':
+                if epi == 'CTERM':
                     if nodes[n]['CTERM'] in manyXList:
                         nodes[n]['CTERM'] = "many x"
                     elif 'X' in nodes[n]['CTERM']:
@@ -839,8 +887,8 @@ rule epitopes:
 
         for node in nodes:
             for epi,seq in nodes[node].items():
-                min_count2 = params.min_count if epi is not "CTERM" else 6
-                if epi is "CTERM" and seq in manyXList:
+                min_count2 = params.min_count if epi != "CTERM" else 6
+                if epi == "CTERM" and seq in manyXList:
                     nodes[node][epi]='many X'
                 elif epitope_counts[epi][seq]<min_count2:#params.min_count:
                     nodes[node][epi]='other'
@@ -898,6 +946,7 @@ rule export_vp1:
         epis = rules.epitopes.output.node_data,
         clades = rules.clades.output.clade_data,
         colors = files.colors,
+        lat_lon = files.lat_long,
         auspice_config = files.auspice_config,
         subgeno_meta = rules.add_subgeno.output.new_meta #this is just here to force the rule to run!
     output:
@@ -912,7 +961,9 @@ rule export_vp1:
             --auspice-config {input.auspice_config} \
             --output {output.auspice} \
             --include-root-sequence \
-            --colors {input.colors}
+            --colors {input.colors} \
+            --minify-json \
+            --lat-longs {input.lat_lon}
         """
         #--output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
 
@@ -941,6 +992,7 @@ rule export_genome:
             --colors {input.colors} --auspice-config {input.auspice_config} \
             --output {output.auspice} \
             --include-root-sequence \
+            --minify-json \
             --lat-longs {input.lat_lon}
         """
         #--output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
