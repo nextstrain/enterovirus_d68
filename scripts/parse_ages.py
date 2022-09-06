@@ -16,6 +16,7 @@ import re
 # Note that range 0-18 is put as <18 because I think this is what is meant
 #       (x-18 is always recorded as <18 in age_range 2 and 3)
 
+#these functions now used in BVBRC_parse.py as well
 
 #Converts months to years. Pass ints
 def month_to_year(mon):
