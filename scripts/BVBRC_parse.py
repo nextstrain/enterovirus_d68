@@ -182,6 +182,20 @@ recovered_ages = reparsed_ages.apply(lambda x: " ".join([str(w2n.word_to_num(x.s
 #TODO
 #parse isolation source more fully.
 
+#respiratory swabs
+np_swab = meta["Isolation Source"].apply(lambda x: x if 
+    (bool(re.search(r"nasal|throat|mouth|naso|phary|resp|NP|TS", x)) and bool(re.search(r"swab", x))) or bool(re.search(r"NP|TS|RS", x))
+    else "")
+
+#respiratory aspirates
+np_asp = meta["Isolation Source"].apply(lambda x: x if 
+    bool(re.search(r"aspirate", x)) or bool(re.search(r"NPA", x))
+    else "")
+
+#washes/lavages
+np_lav = meta["Isolation Source"].apply(lambda x: x if 
+    bool(re.search(r"lavage|wash", x)) or bool(re.search(r"NW|TW|BAL", x))
+    else "")
 
 # Host Gender
 # seems to be standardized but let's ensure, esp as added values from Isolation source
