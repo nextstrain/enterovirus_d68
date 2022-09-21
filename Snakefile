@@ -59,6 +59,8 @@ wildcard_constraints:
 #To run all genes in genome: (some are too short and will fail) with default settings
 # snakemake genome_genes
 
+
+
 rule all: #essentially runs 'default_vp1' and 'default_genome' rules
     input:
         #auspice_tree = expand("{seg}/auspice/enterovirus_d68_{seg}_tree.json", seg=["vp1","genome"]),
@@ -113,6 +115,9 @@ rule files:
         raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
         #raw_vipr_vp1 = "vp1/data/allEntero-22Jan20.tsv", #raw VIPR download!
         raw_vipr_vp1 = "vp1/data/allEntero-03Sep22.tsv", #raw VIPR download!
+
+        raw_bvbrc_genome = "BVBRC_genome.csv",
+        raw_bvbrc_vp1 = "BVBRC_genome.csv",
         
         #samples sequenced in Sweden
         swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
@@ -121,7 +126,7 @@ rule files:
         manual_seqs = "{length}/data/manual-seqs-ages.fasta",
         manual_meta = "{length}/data/manual-meta-ages.csv",
 
-        #add historic data? Currently not used!
+        # add historic data? Currently not used!
         hist_meta = "data/others_from_adam.csv", #"data/all_hist.csv",
         hist_seqs = "data/others_from_adam.fst", #"data/all_hist.fasta",
 
@@ -153,6 +158,33 @@ def is_rerun(wildcards):
 
 # This figures out which ViPR file to use depending on whether calling genome or vp1 run
 VIPR_FILES = {"genome": files.raw_vipr_genome, "vp1": files.raw_vipr_vp1}
+BVBRC_FILES = {"genome": files.raw_bvbrc_genome, "vp1": files.raw_bvbrc_vp1}
+
+rule parse_bvbrc_meta:
+    input:
+        meta = lambda wildcards: BVBRC_FILES[wildcards.length],
+        regions = ancient(files.regions)
+    output:
+        out = "{length}/temp/current_bvbrc_download.tsv"
+    params:
+        rerun = lambda wildcards: is_rerun(wildcards.length)
+    #messages do not work with calling lambda functions....
+    #message:
+    #    "This {wildcards.length} rerun will use existing GenBank files! Only new accession numbers will be downloaded" if (lambda wildcards: is_rerun(wildcards.length)) else "Starting new {wildcards.length} run from scratch. All VIPR samples will be downloaded."
+    shell:
+        """
+        # Figure out message to show user.
+        rrun={params.rerun}
+        if [ $rrun == "True" ]; then
+            echo "This {wildcards.length} rerun will use existing GenBank files! Only new accession numbers will be downloaded"
+        else
+            echo "Starting new {wildcards.length} run from scratch. All VIPR samples will be downloaded."
+        fi
+
+        python scripts/BVBRC_parse.py --input {input.meta} --output {output.out} \
+            --regions {input.regions} \
+            --length {wildcards.length}
+        """
 
 ##############################
 # Parse metadata from ViPR
