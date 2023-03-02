@@ -71,19 +71,25 @@ if __name__ == '__main__':
 
 
     for i, row in ages.iterrows():
-        #only do this if the accession is in the metadata
+        #only do this if the accession or strain is in the metadata
+        #figure out which key to use.
+        meta_key = pd.Series(dtype=str) #initialize empty one in case not found
         if row.accession in meta.accession.values:
-            
+            meta_key = meta.accession == row.accession
+        elif row.accession in meta.strain.values:
+            meta_key = meta.strain == row.accession
+
+        if not meta_key.empty:
             if not pd.isnull(row.date):
-                meta.loc[meta.accession == row.accession, 'date'] = row.date.strip()
+                meta.loc[meta_key, 'date'] = row.date.strip()
             if not pd.isnull(row.sex):
-                meta.loc[meta.accession == row.accession, 'sex'] = row.sex.strip()
+                meta.loc[meta_key, 'sex'] = row.sex.strip()
             if not pd.isnull(row.symptom):
-                meta.loc[meta.accession == row.accession, 'symptom'] = row.symptom.strip()
+                meta.loc[meta_key, 'symptom'] = row.symptom.strip()
             if not pd.isnull(row.country):
-                meta.loc[meta.accession == row.accession, 'country'] = row.country.strip()
+                meta.loc[meta_key, 'country'] = row.country.strip()
             if not pd.isnull(row.region):
-                meta.loc[meta.accession == row.accession, 'region'] = row.region.strip()
+                meta.loc[meta_key, 'region'] = row.region.strip()
 
             #0.8    years   leave
             #77     years   leave
@@ -114,7 +120,7 @@ if __name__ == '__main__':
                 else:
                     new_age = str(convert_to_year(row.age))
 
-                meta.loc[meta.accession == row.accession, 'age'] = new_age
+                meta.loc[meta_key, 'age'] = new_age
 
     meta.to_csv(args.meta_out_ages, sep='\t', index=False)
 
