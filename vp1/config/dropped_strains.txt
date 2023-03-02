@@ -62,3 +62,29 @@ EVD68_Capsid_ENG_Sep21a #identical to SWG_ENG_Sep21a, so exclude (longer seq, if
 EVD68_Capsid_ENG_Oct21d #identical to SWG_ENG_Oct21d, so exclude (longer seq, if needed another time!)
 EVD68_Capsid_ENG_Oct21e #identical to SWG_ENG_Oct21e, so exclude (longer seq, if needed another time!)
 EVD68_Capsid_ENG_Sep21e #identical to SWG_ENG_Sep21e, so exclude (longer seq, if needed another time!)
+USA/MN/2003-23220__MN240496 #underdiverged, usually removed by treetime
+UNKNOWN-AY355268__AY355268 #seems problematic, often messes up rooting
+PUMCH7495Aug08__JN169107 #ragged tail - impacts tree
+PUMCH7487Aug08__JN169112 #ragged tail - impacts tree
+PUMCH3223Aug06__JN169114 #ragged tail - impacts tree
+PUMCH3653Oct06__JN169113 #ragged tail - impacts tree
+PUMCH3266Aug06__JN169116 #ragged tail - impacts tree
+PUMCH3391Sep06__JN169111 #ragged tail - impacts tree
+PUMCH3543Sep06__JN169118 #ragged tail - impacts tree
+PUMCH3036Aug06__JN169109 #ragged tail - impacts tree
+PUMCH3542Sep06__JN169108 #ragged tail - impacts tree
+PUMCH3245Aug06__JN169115 #ragged tail - impacts tree
+PUMCH3271Aug06__JN169110 #ragged tail - impacts tree
+PUMCH3747Oct06__JN169117 #ragged tail - impacts tree
+BE02-21-13 #2021 sequence but underdiverged - looks like 2019
+BE02-21-16 # very bad quality sequence that maaft can't align properly
+#ES01-21-168 #ragged tail - impacts tree - gone from data now
+#ES01-21-165 #ragged tail - impacts tree
+#IE01-21-06 #ragged tail - impacts tree
+#NL04-21-05 #ragged tail - impacts tree
+#NL04-21-12 #ragged tail - impacts tree
+#ES01-21-18 #ragged tail - impacts tree
+#ES01-21-21 #ragged tail - impacts tree
+#IT01-21-08 #ragged tail - impacts tree
+#BE02-21-10 #ragged tail - impacts tree
+#UK01-21-01 #really over diverged
