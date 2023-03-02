@@ -25,10 +25,12 @@ country	Canary Islands	#ff00ff
 
 region	Japan Korea	#996633
 region	North America	#DC2F24
+region	South America	#f19d00
 region	Oceania	#FFCC00
 region	Europe	#339933
 region	China	#511EA8
-region	Southeast Asia	#527CCE
+region	Southeast Asia	#050080
+region	West Asia	#527CCE
 region	South Asia	#3399FF
 region	Africa	#9933FF
 
