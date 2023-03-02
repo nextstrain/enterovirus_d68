@@ -16,6 +16,7 @@ country	Haiti	#F3F100
 
 country	Ireland	#35F5FF
 country	United Kingdom	#2DCCEA
+country	Norway	#28B7DF
 country	Spain	#25A3D5
 country	France	#1D7BC0
 country	Netherlands	#1552AA
@@ -48,6 +49,17 @@ country	Japan	#F38700
 country	New Zealand	#996633
 country	Australia	#c37509
 
+region	Japan Korea	#996633
+region	North America	#DC2F24
+region	South America	#f19d00
+region	Oceania	#FFCC00
+region	Europe	#339933
+region	China	#511EA8
+region	Southeast Asia	#050080
+region	West Asia	#527CCE
+region	South Asia	#3399FF
+region	Africa	#9933FF
+
 age_range1	<1y	#d7191c
 age_range1	1-5y	#fdae61
 age_range1	6-17y	#ffd11a
@@ -63,7 +75,9 @@ age_range3	>=18y	#2c7bb6
 
 BC	DTTQTF	#000075
 BC	DTTQAF	#bfef45
+BC	DTVQAF	#b1ffdf
 BC	DTAQAF	#4363d8
+BC	DTARAF	#f8a46a
 BC	DTAQTF	#911eb4
 BC	NTEQTF	#f58231
 BC	NAEQTF	#f032e6
@@ -80,6 +94,7 @@ DE	NGSSNNTYM	#42d4f4
 DE	NGSSSNTYM	#f032e6
 DE	NDSSNNTYM	#ffe119
 DE	NGSSNNTYV	#e6194B
+DE	NGS-NNTYV	#9A9531
 DE	NGGSNNTYV	#f7adec
 DE	SGSSNNTYV	#6b4519
 DE	NDSSNNTYV	#f8a46a
