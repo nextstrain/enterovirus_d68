@@ -6,7 +6,7 @@
 ### min_len
 # allows users to set the min sequence length in 'filter' through the file name.
 # It must be either nothing or preceeded by an underscore.
-# *** It DOES NOT CHANGE what's downloaded from GenBank/ViPR ***
+# *** It DOES NOT CHANGE what's downloaded from GenBank/INSDC ***
 # This is to include 'manual' or 'personal' sequences that are shorter, in a 700bp background tree
 #Ex: "vp1/auspice/enterovirus_d68_vp1_300_tree.json" will do a VP1 run with min-length 300
 
@@ -109,25 +109,26 @@ rule default_vp1_date:
 
 rule files:
     input:
-        #raw_vipr_genome = "genome/data/genomeEntero-22Jan20.tsv", #raw VIPR download!
-        raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
-        #raw_vipr_vp1 = "vp1/data/allEntero-22Jan20.tsv", #raw VIPR download!
-        raw_vipr_vp1 = "vp1/data/allEntero-03Sep22.tsv", #raw VIPR download!
+        #files downloaded from INSDC
+        #raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
+        raw_insdc_genome = "genome/data/sequences-NCBIVirus-2024-04-26.tsv", #modified download from NCBIVirus
+        raw_insdc_vp1 = "vp1/data/allEntero-03Sep22.tsv", #modified download from NCBIVirus
         
+        ### Here one can insert data not on INSDC - ensure file formats are correct and all fastas end in an empty line
+        ### Most of this data should now be on INSDC
         #samples sequenced in Sweden
-        swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
-        swedish_meta = "data/20190611_Karolinska-region.csv",
-        #samples added manually - not from ViPR
+        swedish_seqs = "data/20190611_Karolinska_25Jul19_{length}.fasta",
+        swedish_meta = "data/20190611_Karolinska.csv",
+        #samples added manually via other routes - not from INSDC
         manual_seqs = "{length}/data/manual-seqs-ages.fasta",
         manual_meta = "{length}/data/manual-meta-ages.csv",
+        #add 2021/2 data from ENPEN - should all be on INSDC now
+        enpen_meta_2021 = "data/ENPEN_seq2021-meta.csv",
+        enpen_seqs_2021 = "data/ENPEN_seq2021-seqs.fasta",
 
         #add historic data? Currently not used!
         hist_meta = "data/others_from_adam.csv", #"data/all_hist.csv",
         hist_seqs = "data/others_from_adam.fst", #"data/all_hist.fasta",
-
-        #add 2021 data from ENPEN - produced from C:\Users\Emma\wsl\enteroviruses\Projects\2022_documents\parsing.r
-        meta_2021 = "raw_2021_data/seq2021-meta.csv",
-        seqs_2021 = "raw_2021_data/seq2021-seqs.fasta",
 
         #other data files (common to both runs)
         extra_meta = "data/age-data.tsv",
@@ -147,27 +148,27 @@ rule files:
 files = rules.files.input
 
 import os.path
-RERUN = True if os.path.isfile("{length}/genbank/current_vipr_download.tsv") else False
+RERUN = True if os.path.isfile("{length}/genbank/current_insdc_download.tsv") else False
 
 # This function checks for presence of a file to determine if a rerun!
 def is_rerun(wildcards):
     #print("{}/genbank/current_vipr_download.tsv".format(wildcards))
     #print(os.path.isfile("{}/genbank/current_vipr_download.tsv".format(wildcards)))
-    return os.path.isfile("{}/genbank/current_vipr_download.tsv".format(wildcards))
+    return os.path.isfile("{}/genbank/current_insdc_download.tsv".format(wildcards))
 
-# This figures out which ViPR file to use depending on whether calling genome or vp1 run
-VIPR_FILES = {"genome": files.raw_vipr_genome, "vp1": files.raw_vipr_vp1}
+# This figures out which INSDC file to use depending on whether calling genome or vp1 run
+INSDC_FILES = {"genome": files.raw_insdc_genome, "vp1": files.raw_insdc_vp1}
 
 ##############################
-# Parse metadata from ViPR
+# Parse metadata from INSDC
 # adds a column 'orig_strain' - adds accession to new 'strain' for VP1, blank for genome
 ###############################
-rule parse_vipr_meta:
+rule parse_insdc_meta:
     input:
-        meta = lambda wildcards: VIPR_FILES[wildcards.length],
+        meta = lambda wildcards: INSDC_FILES[wildcards.length],
         regions = ancient(files.regions)
     output:
-        out = "{length}/temp/current_vipr_download.tsv"
+        out = "{length}/temp/current_insdc_download.tsv"
     params:
         rerun = lambda wildcards: is_rerun(wildcards.length)
     #messages do not work with calling lambda functions....
@@ -180,7 +181,7 @@ rule parse_vipr_meta:
         if [ $rrun == "True" ]; then
             echo "This {wildcards.length} rerun will use existing GenBank files! Only new accession numbers will be downloaded"
         else
-            echo "Starting new {wildcards.length} run from scratch. All VIPR samples will be downloaded."
+            echo "Starting new {wildcards.length} run from scratch. All INSDC samples will be downloaded."
         fi
 
         python scripts/vipr_parse.py --input {input.meta} --output {output.out} \
@@ -198,9 +199,9 @@ rule find_new:
     input:
         swed_meta = ancient(files.swedish_meta), #do not rerun if other meta changes - won't influence genbank!
         man_meta = ancient(files.manual_meta),
-        new_meta = rules.parse_vipr_meta.output.out
+        new_meta = rules.parse_insdc_meta.output.out
     params:
-        old_meta = ancient("{length}/genbank/current_vipr_download.tsv")
+        old_meta = ancient("{length}/genbank/current_insdc_download.tsv")
     output:
         "{length}/temp/meta_to_download.tsv" 
     shell:
@@ -423,11 +424,11 @@ rule make_database:
     input:
         gen_seqs = "{length}/temp/genbank_sequences.fasta",
         gen_meta = "{length}/temp/genbank_meta.tsv",
-        download = "{length}/temp/current_vipr_download.tsv"
+        download = "{length}/temp/current_insdc_download.tsv"
     output:
         gen_seqs = "{length}/genbank/genbank_sequences.fasta",
         gen_meta = "{length}/genbank/genbank_meta.tsv",
-        download = "{length}/genbank/current_vipr_download.tsv",
+        download = "{length}/genbank/current_insdc_download.tsv",
     params:
         rerun = lambda wildcards: is_rerun(wildcards.length)
     #messages do not work with calling lambda functions
@@ -472,7 +473,7 @@ rule make_database_vp1:
 
 #####################################################################################################
 #####################################################################################################
-#    Bring together ViPR/Genbank and own samples
+#    Bring together INSDC/Genbank and own samples
 #####################################################################################################
 #####################################################################################################
 
@@ -483,7 +484,7 @@ rule make_database_vp1:
 ###############################
 rule concat_meta:
     input:
-        metadata = [files.swedish_meta, files.manual_meta, files.meta_2021, #files.hist_meta,
+        metadata = [files.swedish_meta, files.manual_meta, files.enpen_meta_2021, #files.hist_meta,
             "{length}/genbank/genbank_meta.tsv"]
     output:
         metadata = "{length}/results/metadata.tsv"
@@ -506,7 +507,7 @@ rule concat_meta:
 #concatenate genbank seqs with Swedish & manual
 rule concat_sequences:
     input:
-        files.swedish_seqs, files.manual_seqs, files.seqs_2021, #files.hist_seqs,
+        files.swedish_seqs, files.manual_seqs, files.enpen_seqs_2021, #files.hist_seqs,
             "{length}/genbank/genbank_sequences.fasta"
     output:
         "{length}/results/sequences.fasta"
@@ -721,11 +722,10 @@ rule refine:
             --metadata {input.metadata} \
             --output-tree {output.tree} --output-node-data {output.node_data} \
             --timetree --date-confidence --date-inference marginal --coalescent opt \
-            --branch-length-inference marginal \
             --clock-filter-iqd {params.clock_filter_iqd}
         """
         # Have set --branch-length-inference to 'marginal' on recommendation of TreeTime warning when ran on auto
-
+        # --branch-length-inference marginal \  #removed on 1 may 2024
 rule ancestral:
     input:
         tree = rules.refine.output.tree,
