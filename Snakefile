@@ -125,6 +125,10 @@ rule files:
         hist_meta = "data/others_from_adam.csv", #"data/all_hist.csv",
         hist_seqs = "data/others_from_adam.fst", #"data/all_hist.fasta",
 
+        #add 2021 data from ENPEN - produced from C:\Users\Emma\wsl\enteroviruses\Projects\2022_documents\parsing.r
+        meta_2021 = "raw_2021_data/seq2021-meta.csv",
+        seqs_2021 = "raw_2021_data/seq2021-seqs.fasta",
+
         #other data files (common to both runs)
         extra_meta = "data/age-data.tsv",
 
@@ -479,7 +483,7 @@ rule make_database_vp1:
 ###############################
 rule concat_meta:
     input:
-        metadata = [files.swedish_meta, files.manual_meta, #files.hist_meta,
+        metadata = [files.swedish_meta, files.manual_meta, files.meta_2021, #files.hist_meta,
             "{length}/genbank/genbank_meta.tsv"]
     output:
         metadata = "{length}/results/metadata.tsv"
@@ -502,7 +506,7 @@ rule concat_meta:
 #concatenate genbank seqs with Swedish & manual
 rule concat_sequences:
     input:
-        files.swedish_seqs, files.manual_seqs, #files.hist_seqs,
+        files.swedish_seqs, files.manual_seqs, files.seqs_2021, #files.hist_seqs,
             "{length}/genbank/genbank_sequences.fasta"
     output:
         "{length}/results/sequences.fasta"
@@ -647,16 +651,26 @@ rule align:
         sequences = rules.filter.output.sequences,
         reference = files.align_annot_ref
     output:
-        alignment = "{length}/results/aligned{min_len}{max_year}.fasta"
+        alignment = "{length}/results/prealigned{min_len}{max_year}.fasta"
     shell:
         """
         augur align --sequences {input.sequences} --output {output.alignment} \
             --reference-sequence {input.reference} --remove-reference
         """
 
+rule fix_align_codon:
+    input:
+        sequences = rules.align.output.alignment
+    output:
+        alignment = "{length}/results/aligned{min_len}{max_year}.fasta"
+    shell:
+        """
+        Rscript scripts/fixAlignmentGaps.R {input.sequences} {output.alignment}
+        """
+
 rule sub_alignments:
     input:
-        rules.align.output.alignment
+        rules.fix_align_codon.output.alignment
     output:
         alignment = "{length}/results/aligned{gene}{min_len}{max_year}.fasta"
     run:
@@ -935,11 +949,43 @@ rule add_seq_len:
             --meta-out {output.new_meta} \
         """
 
+# Adds another column duplicating country to allow more distinct colours for zoomed figures
+rule duplicate_country:
+    input:
+        metadata = rules.add_seq_len.output.new_meta
+    params:
+        column = "country",
+        new_column = "focal_country"
+    output:
+        new_meta = "{length}/results/metadata_subgeno_seqlen_dupcol{gene}{min_len}{max_year}.tsv"
+    shell:
+        """
+        python scripts/duplicate_column.py \
+            --meta-in {input.metadata} \
+            --meta-out {output.new_meta} \
+            --column-to-dup {params.column} \
+            --dup-column-name {params.new_column}
+        """
+
+#This really should be done in the first stage, but anything that needs to be added
+#without causing a full re-run (only things that aren't inferred) can be added here
+#This needs to be already in the final format accepted (no parsing)
+rule add_extra_meta:
+    input:
+        metadata = rules.duplicate_country.output.new_meta, 
+        new_data = "data/last_minute_data.tsv"
+    output:
+        meta = "{length}/results/metadata_subgeno_seqlen_dupcol_extramet{gene}{min_len}{max_year}.tsv"
+    shell:
+        """
+        python scripts/add_last_minute_data.py --new-meta-in {input.new_data} --meta-in {input.metadata} \
+            --meta-out {output.meta}
+        """
 
 rule export_vp1:
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.add_seq_len.output.new_meta, #rules.add_age.output.meta, 
+        metadata = rules.add_extra_meta.output.meta, #rules.add_age.output.meta, 
         branch_lengths = rules.refine.output.node_data,
         nt_muts = rules.ancestral.output.nt_data,
         aa_muts = rules.translate.output.aa_data,
