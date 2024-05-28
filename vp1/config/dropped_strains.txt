@@ -88,3 +88,6 @@ BE02-21-16 # very bad quality sequence that maaft can't align properly
 #IT01-21-08 #ragged tail - impacts tree
 #BE02-21-10 #ragged tail - impacts tree
 #UK01-21-01 #really over diverged
+F02-3607 Corn  # commercial reference standard sequence 
+F02-3607Corn__PP025902 # commercial reference standard sequence 
+UNKNOWN-AY355268__AY355268  # very overdiverged, clusters with the ref seq above. Labelled Rhino87
