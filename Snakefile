@@ -112,10 +112,11 @@ rule files:
         #files downloaded from INSDC
         #raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
         raw_insdc_genome = "genome/data/sequences-NCBIVirus-2024-04-26.tsv", #modified download from NCBIVirus
-        raw_insdc_vp1 = "vp1/data/allEntero-03Sep22.tsv", #modified download from NCBIVirus
+        raw_insdc_vp1 = "vp1/data/sequences-NCBIVirus-2024-05-01.tsv", #modified download from NCBIVirus
         
         ### Here one can insert data not on INSDC - ensure file formats are correct and all fastas end in an empty line
         ### Most of this data should now be on INSDC
+        ### Be sure to include any of this in the 'find_new' rule to avoid re-downloading (if has an accession)
         #samples sequenced in Sweden
         swedish_seqs = "data/20190611_Karolinska_25Jul19_{length}.fasta",
         swedish_meta = "data/20190611_Karolinska.csv",
@@ -199,6 +200,7 @@ rule find_new:
     input:
         swed_meta = ancient(files.swedish_meta), #do not rerun if other meta changes - won't influence genbank!
         man_meta = ancient(files.manual_meta),
+        enpen_meta = ancient(files.enpen_meta_2021),
         new_meta = rules.parse_insdc_meta.output.out
     params:
         old_meta = ancient("{length}/genbank/current_insdc_download.tsv")
@@ -207,7 +209,7 @@ rule find_new:
     shell:
         """
         python scripts/find_new.py --input-new {input.new_meta} \
-            --exclude {input.swed_meta} {input.man_meta} {params.old_meta} \
+            --exclude {input.swed_meta} {input.man_meta} {input.enpen_meta} {params.old_meta} \
             --output {output}
         """
 
