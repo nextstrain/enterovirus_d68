@@ -95,6 +95,13 @@
     {"name": "Margarida Pires Simoes", "url": "https://www.cienciavitae.pt/portal/511C-89AD-16E8"},
     {"name": "Kim Benschop", "url": "https://organovir.com/kim-benschop/"}
   ],
+  "build_url": "https://github.com/nextstrain/enterovirus_d68", 
+  "data_provenance": [
+    {
+      "name": "GenBank",
+      "url": "https://www.ncbi.nlm.nih.gov/genbank/"
+    }
+  ],
   "filters": [
     "country",
     "region",
