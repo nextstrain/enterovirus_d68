@@ -22,8 +22,12 @@ withGap <- grep("G---TAA", seqs)
 countr <- 0
 for(wG in withGap){
     seq <- seqs[[wG]][1]
-    findr <- regexpr("G---TAA", seq) #should be at 425
-    if(findr == 425){
+    findr <- regexpr("G---TAA", seq) #should be at 425 -- or can be at 428
+    if(findr == 425) {
+        newSeq <- gsub("G---TAA","GT---AA", seq)
+        seqs[[wG]][1] <- newSeq
+        countr = countr+1
+    } else if(findr == 428) {
         newSeq <- gsub("G---TAA","GT---AA", seq)
         seqs[[wG]][1] <- newSeq
         countr = countr+1
