@@ -93,7 +93,8 @@ rule default_vp1:
         #auspice_tree = "vp1/auspice/enterovirus_d68_vp1_tree.json",
         #auspice_meta = "vp1/auspice/enterovirus_d68_vp1_meta.json"
         auspice_out = "vp1/auspice/enterovirus_d68_vp1.json",
-        tip_freq_out = "vp1/auspice/enterovirus_d68_vp1_tip-frequencies.json"
+        tip_freq_out = "vp1/auspice/enterovirus_d68_vp1_tip-frequencies.json",
+        root_seq = "vp1/auspice/enterovirus_d68_vp1_root-sequence.json"
 
 rule default_genome:
     input:
@@ -728,6 +729,7 @@ rule refine:
         """
         # Have set --branch-length-inference to 'marginal' on recommendation of TreeTime warning when ran on auto
         # --branch-length-inference marginal \  #removed on 1 may 2024
+
 rule ancestral:
     input:
         tree = rules.refine.output.tree,
