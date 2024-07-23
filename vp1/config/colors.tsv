@@ -27,6 +27,7 @@ country	Italy	#4D0099
 country	Sweden	#6400A1
 country	Denmark	#7C00A9
 country	Finland	#9400B1
+country	Russia	#29295D
 
 country	Senegal	#00F366
 country	Gambia	#23E244
@@ -44,6 +45,7 @@ country	China	#F30000
 country	Hong Kong	#F32200
 country	Taiwan	#F34400
 country	Philippines	#F36500
+country	South Korea	#F37600
 country	Japan	#F38700
 
 country	New Zealand	#996633
@@ -96,6 +98,7 @@ DE	NDSSNNTYM	#ffe119
 DE	NGSSNNTYV	#e6194B
 DE	NGS-NNTYV	#9A9531
 DE	NGGSNNTYV	#f7adec
+DE	NGGNNNTYV	#A1DB87
 DE	SGSSNNTYV	#6b4519
 DE	NDSSNNTYV	#f8a46a
 DE	NGSSN-TYV	#b1ffdf

@@ -6,7 +6,7 @@
 ### min_len
 # allows users to set the min sequence length in 'filter' through the file name.
 # It must be either nothing or preceeded by an underscore.
-# *** It DOES NOT CHANGE what's downloaded from GenBank/ViPR ***
+# *** It DOES NOT CHANGE what's downloaded from GenBank/INSDC ***
 # This is to include 'manual' or 'personal' sequences that are shorter, in a 700bp background tree
 #Ex: "vp1/auspice/enterovirus_d68_vp1_300_tree.json" will do a VP1 run with min-length 300
 
@@ -93,7 +93,8 @@ rule default_vp1:
         #auspice_tree = "vp1/auspice/enterovirus_d68_vp1_tree.json",
         #auspice_meta = "vp1/auspice/enterovirus_d68_vp1_meta.json"
         auspice_out = "vp1/auspice/enterovirus_d68_vp1.json",
-        tip_freq_out = "vp1/auspice/enterovirus_d68_vp1_tip-frequencies.json"
+        tip_freq_out = "vp1/auspice/enterovirus_d68_vp1_tip-frequencies.json",
+        root_seq = "vp1/auspice/enterovirus_d68_vp1_root-sequence.json"
 
 rule default_genome:
     input:
@@ -109,17 +110,23 @@ rule default_vp1_date:
 
 rule files:
     input:
-        #raw_vipr_genome = "genome/data/genomeEntero-22Jan20.tsv", #raw VIPR download!
-        raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
-        #raw_vipr_vp1 = "vp1/data/allEntero-22Jan20.tsv", #raw VIPR download!
-        raw_vipr_vp1 = "vp1/data/allEntero-03Sep22.tsv", #raw VIPR download!
+        #files downloaded from INSDC
+        #raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
+        raw_insdc_genome = "genome/data/sequences-NCBIVirus-2024-04-26.tsv", #modified download from NCBIVirus
+        raw_insdc_vp1 = "vp1/data/sequences-NCBIVirus-2024-05-01.tsv", #modified download from NCBIVirus
         
+        ### Here one can insert data not on INSDC - ensure file formats are correct and all fastas end in an empty line
+        ### Most of this data should now be on INSDC
+        ### Be sure to include any of this in the 'find_new' rule to avoid re-downloading (if has an accession)
         #samples sequenced in Sweden
-        swedish_seqs = "data/ev_d68_genomes_25Jul19_{length}.fasta",
-        swedish_meta = "data/20190611_Karolinska-region.csv",
-        #samples added manually - not from ViPR
+        swedish_seqs = "data/20190611_Karolinska_25Jul19_{length}.fasta",
+        swedish_meta = "data/20190611_Karolinska.csv",
+        #samples added manually via other routes - not from INSDC
         manual_seqs = "{length}/data/manual-seqs-ages.fasta",
         manual_meta = "{length}/data/manual-meta-ages.csv",
+        #add 2021/2 data from ENPEN - should all be on INSDC now
+        enpen_meta_2021 = "data/ENPEN_seq2021-meta.csv",
+        enpen_seqs_2021 = "data/ENPEN_seq2021-seqs.fasta",
 
         #add historic data? Currently not used!
         hist_meta = "data/others_from_adam.csv", #"data/all_hist.csv",
@@ -143,27 +150,27 @@ rule files:
 files = rules.files.input
 
 import os.path
-RERUN = True if os.path.isfile("{length}/genbank/current_vipr_download.tsv") else False
+RERUN = True if os.path.isfile("{length}/genbank/current_insdc_download.tsv") else False
 
 # This function checks for presence of a file to determine if a rerun!
 def is_rerun(wildcards):
     #print("{}/genbank/current_vipr_download.tsv".format(wildcards))
     #print(os.path.isfile("{}/genbank/current_vipr_download.tsv".format(wildcards)))
-    return os.path.isfile("{}/genbank/current_vipr_download.tsv".format(wildcards))
+    return os.path.isfile("{}/genbank/current_insdc_download.tsv".format(wildcards))
 
-# This figures out which ViPR file to use depending on whether calling genome or vp1 run
-VIPR_FILES = {"genome": files.raw_vipr_genome, "vp1": files.raw_vipr_vp1}
+# This figures out which INSDC file to use depending on whether calling genome or vp1 run
+INSDC_FILES = {"genome": files.raw_insdc_genome, "vp1": files.raw_insdc_vp1}
 
 ##############################
-# Parse metadata from ViPR
+# Parse metadata from INSDC
 # adds a column 'orig_strain' - adds accession to new 'strain' for VP1, blank for genome
 ###############################
-rule parse_vipr_meta:
+rule parse_insdc_meta:
     input:
-        meta = lambda wildcards: VIPR_FILES[wildcards.length],
+        meta = lambda wildcards: INSDC_FILES[wildcards.length],
         regions = ancient(files.regions)
     output:
-        out = "{length}/temp/current_vipr_download.tsv"
+        out = "{length}/temp/current_insdc_download.tsv"
     params:
         rerun = lambda wildcards: is_rerun(wildcards.length)
     #messages do not work with calling lambda functions....
@@ -176,7 +183,7 @@ rule parse_vipr_meta:
         if [ $rrun == "True" ]; then
             echo "This {wildcards.length} rerun will use existing GenBank files! Only new accession numbers will be downloaded"
         else
-            echo "Starting new {wildcards.length} run from scratch. All VIPR samples will be downloaded."
+            echo "Starting new {wildcards.length} run from scratch. All INSDC samples will be downloaded."
         fi
 
         python scripts/vipr_parse.py --input {input.meta} --output {output.out} \
@@ -194,15 +201,16 @@ rule find_new:
     input:
         swed_meta = ancient(files.swedish_meta), #do not rerun if other meta changes - won't influence genbank!
         man_meta = ancient(files.manual_meta),
-        new_meta = rules.parse_vipr_meta.output.out
+        enpen_meta = ancient(files.enpen_meta_2021),
+        new_meta = rules.parse_insdc_meta.output.out
     params:
-        old_meta = ancient("{length}/genbank/current_vipr_download.tsv")
+        old_meta = ancient("{length}/genbank/current_insdc_download.tsv")
     output:
         "{length}/temp/meta_to_download.tsv" 
     shell:
         """
         python scripts/find_new.py --input-new {input.new_meta} \
-            --exclude {input.swed_meta} {input.man_meta} {params.old_meta} \
+            --exclude {input.swed_meta} {input.man_meta} {input.enpen_meta} {params.old_meta} \
             --output {output}
         """
 
@@ -419,11 +427,11 @@ rule make_database:
     input:
         gen_seqs = "{length}/temp/genbank_sequences.fasta",
         gen_meta = "{length}/temp/genbank_meta.tsv",
-        download = "{length}/temp/current_vipr_download.tsv"
+        download = "{length}/temp/current_insdc_download.tsv"
     output:
         gen_seqs = "{length}/genbank/genbank_sequences.fasta",
         gen_meta = "{length}/genbank/genbank_meta.tsv",
-        download = "{length}/genbank/current_vipr_download.tsv",
+        download = "{length}/genbank/current_insdc_download.tsv",
     params:
         rerun = lambda wildcards: is_rerun(wildcards.length)
     #messages do not work with calling lambda functions
@@ -468,7 +476,7 @@ rule make_database_vp1:
 
 #####################################################################################################
 #####################################################################################################
-#    Bring together ViPR/Genbank and own samples
+#    Bring together INSDC/Genbank and own samples
 #####################################################################################################
 #####################################################################################################
 
@@ -479,7 +487,7 @@ rule make_database_vp1:
 ###############################
 rule concat_meta:
     input:
-        metadata = [files.swedish_meta, files.manual_meta, #files.hist_meta,
+        metadata = [files.swedish_meta, files.manual_meta, files.enpen_meta_2021, #files.hist_meta,
             "{length}/genbank/genbank_meta.tsv"]
     output:
         metadata = "{length}/results/metadata.tsv"
@@ -502,7 +510,7 @@ rule concat_meta:
 #concatenate genbank seqs with Swedish & manual
 rule concat_sequences:
     input:
-        files.swedish_seqs, files.manual_seqs, #files.hist_seqs,
+        files.swedish_seqs, files.manual_seqs, files.enpen_seqs_2021, #files.hist_seqs,
             "{length}/genbank/genbank_sequences.fasta"
     output:
         "{length}/results/sequences.fasta"
@@ -647,16 +655,26 @@ rule align:
         sequences = rules.filter.output.sequences,
         reference = files.align_annot_ref
     output:
-        alignment = "{length}/results/aligned{min_len}{max_year}.fasta"
+        alignment = "{length}/results/prealigned{min_len}{max_year}.fasta"
     shell:
         """
         augur align --sequences {input.sequences} --output {output.alignment} \
             --reference-sequence {input.reference} --remove-reference
         """
 
+rule fix_align_codon:
+    input:
+        sequences = rules.align.output.alignment
+    output:
+        alignment = "{length}/results/aligned{min_len}{max_year}.fasta"
+    shell:
+        """
+        Rscript scripts/fixAlignmentGaps.R {input.sequences} {output.alignment}
+        """
+
 rule sub_alignments:
     input:
-        rules.align.output.alignment
+        rules.fix_align_codon.output.alignment
     output:
         alignment = "{length}/results/aligned{gene}{min_len}{max_year}.fasta"
     run:
@@ -707,10 +725,10 @@ rule refine:
             --metadata {input.metadata} \
             --output-tree {output.tree} --output-node-data {output.node_data} \
             --timetree --date-confidence --date-inference marginal --coalescent opt \
-            --branch-length-inference marginal \
             --clock-filter-iqd {params.clock_filter_iqd}
         """
         # Have set --branch-length-inference to 'marginal' on recommendation of TreeTime warning when ran on auto
+        # --branch-length-inference marginal \  #removed on 1 may 2024
 
 rule ancestral:
     input:
@@ -935,11 +953,43 @@ rule add_seq_len:
             --meta-out {output.new_meta} \
         """
 
+# Adds another column duplicating country to allow more distinct colours for zoomed figures
+rule duplicate_country:
+    input:
+        metadata = rules.add_seq_len.output.new_meta
+    params:
+        column = "country",
+        new_column = "focal_country"
+    output:
+        new_meta = "{length}/results/metadata_subgeno_seqlen_dupcol{gene}{min_len}{max_year}.tsv"
+    shell:
+        """
+        python scripts/duplicate_column.py \
+            --meta-in {input.metadata} \
+            --meta-out {output.new_meta} \
+            --column-to-dup {params.column} \
+            --dup-column-name {params.new_column}
+        """
+
+#This really should be done in the first stage, but anything that needs to be added
+#without causing a full re-run (only things that aren't inferred) can be added here
+#This needs to be already in the final format accepted (no parsing)
+rule add_extra_meta:
+    input:
+        metadata = rules.duplicate_country.output.new_meta, 
+        new_data = "data/last_minute_data.tsv"
+    output:
+        meta = "{length}/results/metadata_subgeno_seqlen_dupcol_extramet{gene}{min_len}{max_year}.tsv"
+    shell:
+        """
+        python scripts/add_last_minute_data.py --new-meta-in {input.new_data} --meta-in {input.metadata} \
+            --meta-out {output.meta}
+        """
 
 rule export_vp1:
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.add_seq_len.output.new_meta, #rules.add_age.output.meta, 
+        metadata = rules.add_extra_meta.output.meta, #rules.add_age.output.meta, 
         branch_lengths = rules.refine.output.node_data,
         nt_muts = rules.ancestral.output.nt_data,
         aa_muts = rules.translate.output.aa_data,

@@ -1,0 +1,19 @@
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+
+.snakemake
+.env
+
+genome/auspice/
+genome/data/
+genome/temp/
+genome/genbank/
+genome/results
+vp1/auspice/
+vp1/data/
+vp1/genbank/
+vp1/results/
+vp1/temp/
+
+data/
+
