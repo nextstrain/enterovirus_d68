@@ -2,6 +2,7 @@ import pandas as pd
 from dateutil.parser import parse
 import re, os
 import shutil
+import pandas
 from augur.parse import prettify 
 
 
@@ -103,52 +104,56 @@ if __name__ == '__main__':
     newAge = []
     newSex = []
     for host in meta.genbank_host:
-
-        if re.search('female|Female', host):
-            sex = 'F'
-        elif re.search('male|Male', host):
-            sex = 'M'
-        else:
-            sex = ''
-
-        if re.search('[0-9.]+[A-Z]', host):
-            m = re.search('[0-9.]+[A-Z]', host).group(0)
-            if 'Y' in m:
-                age_month = round(12*float(m.replace("Y", "")), 2)
-                age_year = float(m.replace("Y", ""))
+        if not pandas.isna(host):
+            if re.search('female|Female', host):
+                sex = 'F'
+            elif re.search('male|Male', host):
+                sex = 'M'
             else:
-                age_month = float(m.replace("M", ""))
-                age_year = round(float(m.replace("M", ""))/12, 2)
+                sex = ''
 
-        elif re.search('age [0-9]+$', host): # these are always year
-            m = re.search('age [0-9]+$', host).group(0)
-            age_month = round(12*float(m.replace("age ","")), 2)
-            age_year = float(m.replace("age ",""))
+            if re.search('[0-9.]+[A-Z]', host):
+                m = re.search('[0-9.]+[A-Z]', host).group(0)
+                if 'Y' in m:
+                    age_month = round(12*float(m.replace("Y", "")), 2)
+                    age_year = float(m.replace("Y", ""))
+                else:
+                    age_month = float(m.replace("M", ""))
+                    age_year = round(float(m.replace("M", ""))/12, 2)
 
-        elif re.search('[0-9]+[,][0-9]+ year', host): #these are always year, with european decimal
-            m = re.search('[0-9]+[,][0-9]+ year', host).group(0)
-            m = m.replace(",",".") #replace m with . and process as below
-            age_month = round(12*float(m.replace(" year","")), 2)
-            age_year = float(m.replace(" year",""))
+            elif re.search('age [0-9]+$', host): # these are always year
+                m = re.search('age [0-9]+$', host).group(0)
+                age_month = round(12*float(m.replace("age ","")), 2)
+                age_year = float(m.replace("age ",""))
 
-        elif re.search('[0-9.]+ year', host): #these are always year
-            m = re.search('[0-9.]+ year', host).group(0)
-            age_month = round(12*float(m.replace(" year","")), 2)
-            age_year = float(m.replace(" year",""))
+            elif re.search('[0-9]+[,][0-9]+ year', host): #these are always year, with european decimal
+                m = re.search('[0-9]+[,][0-9]+ year', host).group(0)
+                m = m.replace(",",".") #replace m with . and process as below
+                age_month = round(12*float(m.replace(" year","")), 2)
+                age_year = float(m.replace(" year",""))
 
-        elif re.search(' [0-9.]+ y/o', host): #these are always year
-            m = re.search(' [0-9.]+ y/o', host).group(0)
-            age_month = round(12*float(m.replace(" y/o","")), 2)
-            age_year = float(m.replace(" y/o",""))
+            elif re.search('[0-9.]+ year', host): #these are always year
+                m = re.search('[0-9.]+ year', host).group(0)
+                age_month = round(12*float(m.replace(" year","")), 2)
+                age_year = float(m.replace(" year",""))
 
-        elif re.search('[0-9.]+ month', host):
-            m = re.search('[0-9.]+ month', host).group(0)
-            age_month = float(m.replace(" month",""))
-            age_year = round(float(m.replace(" month", ""))/12, 2)
+            elif re.search(' [0-9.]+ y/o', host): #these are always year
+                m = re.search(' [0-9.]+ y/o', host).group(0)
+                age_month = round(12*float(m.replace(" y/o","")), 2)
+                age_year = float(m.replace(" y/o",""))
 
+            elif re.search('[0-9.]+ month', host):
+                m = re.search('[0-9.]+ month', host).group(0)
+                age_month = float(m.replace(" month",""))
+                age_year = round(float(m.replace(" month", ""))/12, 2)
+
+            else:
+                age_month = ''
+                age_year = ''
         else:
             age_month = ''
             age_year = ''
+            sex = ''
 
         newAge.append(age_year) #newAge.append(age_month)
         newSex.append(sex)
@@ -164,16 +169,19 @@ if __name__ == '__main__':
     #replace countries and remove spaces
     for i, row in meta.iterrows():
         coun = row.country
-        #replace a few countries specifically - add underscores for spaces (so prettify works)
-        for c,r in country_replace:
-            coun = coun.replace(c,r)
-        coun = prettify(coun, camelCase=True)
-        # de-capitalize small words like 'and' 'of' 'the'
-        for c,r in small_word_replace:
-            coun = coun.replace(c,r)
-        if coun in {'usvi', 'usa', 'uk', 'Usvi', 'Usa', 'Uk'}:
-            coun = coun.upper()
-        meta.at[i, 'country'] = coun
+        if pandas.isna(coun):
+            meta.at[i, 'country'] = ""
+        else:
+            #replace a few countries specifically - add underscores for spaces (so prettify works)
+            for c,r in country_replace:
+                coun = coun.replace(c,r)
+            coun = prettify(coun, camelCase=True)
+            # de-capitalize small words like 'and' 'of' 'the'
+            for c,r in small_word_replace:
+                coun = coun.replace(c,r)
+            if coun in {'usvi', 'usa', 'uk', 'Usvi', 'Usa', 'Uk'}:
+                coun = coun.upper()
+            meta.at[i, 'country'] = coun
 
     #get region if supplied
     if args.regions:
