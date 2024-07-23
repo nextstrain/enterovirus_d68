@@ -18,4 +18,4 @@ USA/2018-23209  #cell culture isolate of clinical specimen MN246002
 USA/2018-23216  #cell culture isolate of clinical specimen MN246009
 USA/2018-23252  #cell culture isolate of clinical specimen MN246015
 USA/2018-23263  #cell culture isolate of clinical specimen MN246026
-F02-3607 Corn  #commercial reference standard sequence 
+F02-3607Corn  #commercial reference standard sequence 
