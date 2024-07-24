@@ -12,17 +12,17 @@ Note that the data used for these runs is *not* part of this repository. You can
 
 ## Getting Started 
 
-To download files from NCBI you will need to provide an email address. This should be put in a `.env` file in the base directory, in the format `EMAIL=user@email.com` (add the `.env` file to your `.gitignore` to stop it being pushed publicly). To use this method of accessing the email, you will need to install the `dotenv` package - you can do this via PyPI with `pip install python-dotenv` (or via conda/micromamba with `conda install -c bioconda python-dotenv`)
+To download files from NCBI you will need to provide an email address. This should be put in a `.env` file in the base directory, in the format `EMAIL=user@example.com` (add the `.env` file to your `.gitignore` to stop it being pushed publicly). To use this method of accessing the email, you will need to install the `dotenv` package - you can do this via PyPI with `pip install python-dotenv` (or via conda/micromamba with `conda install -c bioconda python-dotenv`)
 
 ### Data Download 
 To run automatically-downloaded VP1 sequences with this pipeline, you'll need to install local BLAST for this analysis to work. Do this with: 
 `sudo apt-get install ncbi-blast+` (or via conda/micromamba with `conda install -c bioconda blast`).
 
-You should download metadata from [NCBI Virus](https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/find-data/virus), using TaxonID 42789 for EV-D68. After applying filters (if appropriate, see below), _do not select any rows_ and use the 'Download' button in the top-left. Select 'Results Table' and 'CSV format'. Select that you wand to download all records.
+You should download metadata from [NCBI Virus](https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/find-data/virus), using TaxonID 42789 for EV-D68. After applying filters (if appropriate, see below), _do not select any rows_ and use the 'Download' button in the top-left. Select 'Results Table' and 'CSV format'. Select that you want to download all records.
 
 Select all columns, and leave the accession without version.
 
-Move this file into either `genome/data` or `vp1/data` as appropriate, and rename it something sensible. 
+Move this file into either `genome/data` or `vp1/data` as appropriate, and rename it to something sensible. 
 
 ### Data Preparation
 You will now need to adapt the NCBI Virus download file to a format that will work with the older scripts (which expect ViPR input). As noted above, this is temporary and imperfect, but we are working on adapting this properly.
@@ -77,7 +77,7 @@ You can add some extra data, particularly for sequences from GenBank where more 
 # Technical Notes
 
 ## Strain names
-In downloads as specified above, `strain` is not a unique identifier, as multiple segments may come from the same `strain`. This causes problems unique to VP1 analysis (with full-genome, this is not an issue). To handle this, in the VP1 run, the `vipr_parse.py` script generates new `strain` identifiers by combiing the original `strain` column with the accession number, separated by a double-underscore. 
+In downloads as specified above, `strain` is not a unique identifier, as multiple segments may come from the same `strain`. This causes problems unique to VP1 analysis (with full-genome, this is not an issue). To handle this, in the VP1 run, the `vipr_parse.py` script generates new `strain` identifiers by combining the original `strain` column with the accession number, separated by a double-underscore. 
 
 Unlike the VP1 run, strain names are not modified during the full-genome run.
 
