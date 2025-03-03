@@ -19,17 +19,17 @@ data <- fread(input)
 
 # library(data.table)
 # #genome
-# setwd("C:/...../genome/data")
+# setwd("C:/Users/Emma/wsl/enteroviruses/ev_githubs/enterovirus_d68/genome/data")
 # # Read the CSV file
-# data <- fread("sequences-NCBIVirus-2024-04-26_raw.csv")
-# output <- "sequences-NCBIVirus-2024-04-26.tsv"
+# data <- fread("sequences-NCBIVirus-2025-02-09_raw.csv")
+# output <- "sequences-NCBIVirus-2025-02-09.tsv"
 # 
 # 
 # #vp1
-# setwd("C:/....../vp1/data")
+# setwd("C:/Users/Emma/wsl/enteroviruses/ev_githubs/enterovirus_d68/vp1/data")
 # # Read the CSV file
-# data <- fread("sequences-NCBIVirus-2024-05-01_raw.csv")
-# output <- "sequences-NCBIVirus-2024-05-01.tsv"
+# data <- fread("sequences-NCBIVirus-2025-02-09_raw.csv")
+# output <- "sequences-NCBIVirus-2025-02-09.tsv"
 
 
 # Reorder and rename columns
@@ -129,24 +129,31 @@ fixing <- gsub(", isolate ", "", fixing)
 fixing <- gsub(" gene for", "", fixing)
 fixing <- gsub(" VP1 protein (VP1)", "", fixing)
 fixing <- gsub(" polyprotein (POL)", "", fixing)
+fixing <- gsub("MAG: ", "", fixing)
+fixing <- gsub("EV D68", "EV-D68", fixing)
 #fixing <- gsub("xx", "", fixing)
 #specifics
 fixing <- gsub("Enterovirus D68 T", "T", fixing) #for those like this: Enterovirus D68 TTa-08-Ph561 RNA
 fixing <- gsub("Enterovirus D68 take3", "take3", fixing)
 fixing <- gsub("Enterovirus D68 take4", "take4", fixing)
 fixing <- gsub("Enterovirus D68 take4", "take4", fixing)
+fixing <- gsub("Human Enterovirus D68", "EV-D68", fixing)
+#start of line
+fixing <- gsub("^Enterovirus D68 ", "EV-D68_", fixing)
 #end of the line
 fixing <- gsub(" 2C gene$", "", fixing)
 fixing <- gsub(" gene$", "", fixing)
 fixing <- gsub(" capsid$", "", fixing)
 fixing <- gsub(" 2C gene$", "", fixing)
 fixing <- gsub(" 2C protein$", "", fixing)
+fixing <- gsub(" VP1 protein$", "", fixing)
 fixing <- gsub(" VP1$", "", fixing)
 fixing <- gsub(" 3D$", "", fixing)
 fixing <- gsub(" P1$", "", fixing)
 fixing <- gsub(" P1 $", "", fixing)
 fixing <- gsub(" VP4/2$", "", fixing)
 fixing <- gsub(" and $", "", fixing)
+fixing <- as.vector(sapply(fixing, trimws))
 
 #add something for empty strings
 empties <- which(fixing == "")

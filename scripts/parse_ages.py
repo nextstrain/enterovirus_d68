@@ -63,7 +63,14 @@ if __name__ == '__main__':
     ages = pd.read_csv(args.ages_in, sep='\t', index_col=False)
     meta = pd.read_csv(args.meta_in, sep='\t', index_col=False)
 
-    #create new column for AFM (& reorder)
+    #ages = pd.read_csv(ages_in, sep='\t', index_col=False)
+    #meta = pd.read_csv(meta_in, sep='\t', index_col=False)
+
+    #create a new column for symptom if it doesn't exist
+    if 'symptom' not in meta.columns:
+        meta['symptom'] = pd.NA 
+
+    # reorder columns
     meta = meta.reindex(columns = ['strain', 'accession', 'date', 'sex', 'age', 
         'symptom', 'country', 'collab_country', 'region', 'host',
         'subgenogroup', 'Lab-ID', 'orig_strain', 'seq-len', 'date_added', 'genbank-host', 'moltype',
@@ -139,8 +146,13 @@ if __name__ == '__main__':
 
     #rename age column raw_age
     meta.rename(columns={'age':'raw_age'}, inplace=True)
+    #create new columns for new ages to go into
+    meta['age'] = pd.NA
+    meta['age_range1'] = pd.NA
+    meta['age_range2'] = pd.NA
+    meta['age_range3'] = pd.NA
 
-    #create new columns for new ages (& reorder)
+    #reorder columns
     meta = meta.reindex(columns = ['strain', 'accession', 'date', 'sex', 'raw_age',
         'symptom', 'age', 'age_range1', 'age_range2', 'age_range3', 'country', 'region', 'collab_country',
         'host',

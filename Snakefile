@@ -101,7 +101,8 @@ rule default_genome:
         #auspice_tree = "genome/auspice/enterovirus_d68_genome_tree.json",
         #auspice_meta = "genome/auspice/enterovirus_d68_genome_meta.json",
         auspice_out = "genome/auspice/enterovirus_d68_genome.json",
-        tip_freq_out = "genome/auspice/enterovirus_d68_genome_tip-frequencies.json"
+        tip_freq_out = "genome/auspice/enterovirus_d68_genome_tip-frequencies.json",
+        root_seq = "genome/auspice/enterovirus_d68_genome_root-sequence.json"
 
 rule default_vp1_date:
     input:
@@ -112,8 +113,8 @@ rule files:
     input:
         #files downloaded from INSDC
         #raw_vipr_genome = "genome/data/genomeEntero-03Sep22.tsv", #raw VIPR download!
-        raw_insdc_genome = "genome/data/sequences-NCBIVirus-2024-04-26.tsv", #modified download from NCBIVirus
-        raw_insdc_vp1 = "vp1/data/sequences-NCBIVirus-2024-05-01.tsv", #modified download from NCBIVirus
+        raw_insdc_genome = "genome/data/sequences-NCBIVirus-2025-02-09.tsv", #modified download from NCBIVirus
+        raw_insdc_vp1 = "vp1/data/sequences-NCBIVirus-2025-02-09.tsv", #modified download from NCBIVirus
         
         ### Here one can insert data not on INSDC - ensure file formats are correct and all fastas end in an empty line
         ### Most of this data should now be on INSDC
@@ -692,6 +693,7 @@ rule sub_alignments:
         with open(output.alignment, "w") as oh:
             for record in alignment:
                 sequence = record.seq.tomutable()
+                # sequence = Bio.Seq.MutableSeq(record.seq) ##this has been depreciated, see https://github.com/biopython/biopython/blob/master/DEPRECATED.rst (search tomutable)
                 gene_keep = sequence[b[0]:b[1]]
                 sequence[0:len(sequence)] = len(sequence)*"N"
                 sequence[b[0]:b[1]] = gene_keep
@@ -1046,3 +1048,31 @@ rule export_genome:
             --lat-longs {input.lat_lon}
         """
         #--output-tree {output.auspice_tree} --output-meta {output.auspice_meta} \
+
+def date():
+    return datetime.date.today().strftime("%Y-%m-%d")
+
+# This rule only works for default builds for VP1 and genome! Do not use if other runs have been done.
+# This rules copies dated versions of the auspice files to the auspice folder to preserve them
+rule archive_jsons:
+    input:
+        genome = rules.default_genome.input, #in order json, tip-freq, then root-seq
+        vp1 = rules.default_vp1.input
+    output:
+        expand("auspice/enterovirus_d68_genome-{date}.json", date=date()),
+        expand("auspice/enterovirus_d68_genome-{date}_tip-frequencies.json", date=date()),
+        expand("auspice/enterovirus_d68_genome-{date}_root-sequence.json", date=date()),
+        expand("auspice/enterovirus_d68_vp1-{date}.json", date=date()),
+        expand("auspice/enterovirus_d68_vp1-{date}_tip-frequencies.json", date=date()),
+        expand("auspice/enterovirus_d68_vp1-{date}_root-sequence.json", date=date())
+
+    shell:
+        """
+        cp {input.genome[0]} {output[0]} && 
+        cp {input.genome[1]} {output[1]} &&
+        cp {input.genome[2]} {output[2]}
+        cp {input.vp1[0]} {output[3]} &&
+        cp {input.vp1[1]} {output[4]} &&
+        cp {input.vp1[2]} {output[5]}
+        """
+
